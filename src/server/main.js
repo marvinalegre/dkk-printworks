@@ -1,9 +1,9 @@
 import express from "express";
 const app = express();
-const port = 3000;
+const port = 8788;
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
+app.get("/api/user", (req, res) => {
+  res.json({ loggedIn: false });
 });
 
 app.listen(port, () => {
