@@ -12,30 +12,47 @@ import LoginForm, {
 import LogoutPage, { loader as logoutPageLoader } from "./routes/LogoutPage";
 import OrderForm from "./components/OrderForm";
 
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <Root />,
+      loader: rootLoader,
+      children: [
+        { index: true, element: <OrderForm /> },
+        {
+          path: "/login",
+          element: <LoginForm />,
+          action: loginAction,
+          loader: loginLoader,
+        },
+        {
+          path: "/marvinalegre",
+          element: <p className="p-8">under construction</p>,
+        },
+        { path: "/logout", element: <LogoutPage />, loader: logoutPageLoader },
+      ],
+    },
+  ],
   {
-    path: "/",
-    element: <Root />,
-    loader: rootLoader,
-    children: [
-      { index: true, element: <OrderForm /> },
-      {
-        path: "/login",
-        element: <LoginForm />,
-        action: loginAction,
-        loader: loginLoader,
-      },
-      {
-        path: "/marvinalegre",
-        element: <p className="p-8">under construction</p>,
-      },
-      { path: "/logout", element: <LogoutPage />, loader: logoutPageLoader },
-    ],
-  },
-]);
+    future: {
+      v7_fetcherPersist: true,
+      v7_normalizeFormMethod: true,
+      v7_partialHydration: true,
+      v7_relativeSplatPath: true,
+      v7_skipActionErrorRevalidation: true,
+      v7_skipActionStatusRevalidation: true,
+    },
+  }
+);
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <RouterProvider
+      future={{
+        v7_startTransition: true,
+      }}
+      router={router}
+    />
   </StrictMode>
 );
