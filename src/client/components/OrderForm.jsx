@@ -1,6 +1,10 @@
 export default function OrderComponent() {
   return (
     <div className="p-1 md:p-8">
+      <h2 class="text-2xl font-semibold text-gray-700 hover:text-gray-500 transition-colors duration-300 text-center my-5">
+        Order Form
+      </h2>
+
       <form
         method="post"
         className="p-6 max-w-sm mx-auto bg-form-gray rounded-lg space-y-4"
