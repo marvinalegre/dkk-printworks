@@ -82,7 +82,7 @@ export default function Login() {
             minLength={3}
             maxLength={20}
             required
-            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
           />
           <label
             htmlFor="password"
@@ -96,7 +96,7 @@ export default function Login() {
             type="password"
             minLength={12}
             required
-            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
           />
           <div className="mt-8 space-x-6 text-right">
             <button

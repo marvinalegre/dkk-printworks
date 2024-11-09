@@ -16,14 +16,14 @@ export default function OrderComponent() {
           id="link"
           name="link"
           type="url"
-          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
         />
         <div className="flex items-center">
           <input
             id="print-whole-doc"
             name="printWholeDoc"
             type="checkbox"
-            className="h-5 w-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+            className="h-5 w-5 text-indigo-600 border-gray-300 rounded focus:ring-gray-500"
           />
           <label
             htmlFor="print-whole-doc"
@@ -42,7 +42,7 @@ export default function OrderComponent() {
           id="num-copies"
           name="numCopies"
           type="number"
-          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
         />
         <button type="submit" className="border p-3 rounded bg-green-400">
           place order

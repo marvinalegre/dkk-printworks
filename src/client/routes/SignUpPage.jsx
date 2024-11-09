@@ -81,7 +81,7 @@ export default function SignUp() {
             minLength={3}
             maxLength={20}
             required
-            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
           />
           <br />
           <label
@@ -96,7 +96,7 @@ export default function SignUp() {
             type="password"
             minLength={12}
             required
-            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
           />
           <br />
           <button
