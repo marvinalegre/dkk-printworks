@@ -12,6 +12,9 @@ export async function action({ request }) {
 
   const res = await fetch("/api/login", {
     method: "post",
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({
       username: formData.get("username"),
       password: formData.get("password"),
