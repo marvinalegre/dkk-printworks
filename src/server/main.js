@@ -72,6 +72,10 @@ app.post("/api/login", async (req, res) => {
     });
   }
 });
+app.get("/api/logout", (req, res) => {
+  res.clearCookie("token");
+  res.json({ success: true });
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
