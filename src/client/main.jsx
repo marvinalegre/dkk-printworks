@@ -25,17 +25,17 @@ const router = createBrowserRouter(
       children: [
         { index: true, element: <OrderForm /> },
         {
-          path: "/login",
-          element: <LoginForm />,
-          action: loginAction,
-          loader: loginLoader,
-        },
-        {
           path: "/marvinalegre",
           element: <p className="p-8">under construction</p>,
         },
         { path: "/logout", element: <LogoutPage />, loader: logoutPageLoader },
       ],
+    },
+    {
+      path: "/login",
+      element: <LoginForm />,
+      action: loginAction,
+      loader: loginLoader,
     },
     {
       path: "/signup",
