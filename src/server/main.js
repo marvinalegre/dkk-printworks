@@ -20,9 +20,9 @@ app.use("/api", jwtAuthenticator());
 app.get("/api/user", async (req, res) => {
   if (req.jwtId) {
     res.json({ username: await getUsername(req.jwtId), loggedIn: true });
+  } else {
+    res.json({ loggedIn: false });
   }
-
-  res.json({ loggedIn: false });
 });
 app.post("/api/login", async (req, res) => {
   const { username, password } = req.body;
