@@ -10,6 +10,10 @@ import LoginForm, {
   loader as loginLoader,
 } from "./routes/LoginForm";
 import LogoutPage, { loader as logoutPageLoader } from "./routes/LogoutPage";
+import SignUpPage, {
+  action as signUpPageAction,
+  loader as signUpPageLoader,
+} from "./routes/SignUpPage";
 import OrderForm from "./components/OrderForm";
 
 const router = createBrowserRouter(
@@ -32,6 +36,12 @@ const router = createBrowserRouter(
         },
         { path: "/logout", element: <LogoutPage />, loader: logoutPageLoader },
       ],
+    },
+    {
+      path: "/signup",
+      element: <SignUpPage />,
+      action: signUpPageAction,
+      loader: signUpPageLoader,
     },
   ],
   {
