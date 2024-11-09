@@ -29,3 +29,18 @@ export async function getHashAndJwtId(username) {
     jwtId: row.jwt_id,
   };
 }
+
+export async function insertUser(username, hashedPassword, jwtId) {
+  const db = new Database(`${process.cwd()}/db.sql`);
+  db.pragma("journal_mode = WAL");
+
+  const info = db
+    .prepare(
+      "insert into users (username, hashed_password, jwt_id) values (?, ?, ?)"
+    )
+    .run(username, hashedPassword, jwtId);
+
+  if (info.changes !== 1) throw "user was not inserted";
+
+  db.close();
+}
