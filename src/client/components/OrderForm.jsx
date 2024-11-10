@@ -1,53 +1,112 @@
+import { useState } from "react";
+import { Form } from "react-router-dom";
+
 export default function OrderComponent() {
+  const [onStartScreen, setOnStartScreen] = useState(true);
+  const [onUploadScreen, setOnUploadScreen] = useState(false);
+  const [onPagesScreen, setOnPagesScreen] = useState(false);
+  const [onSummaryScreen, setOnSummaryScreen] = useState(false);
+
+  const [fileName, setFileName] = useState("");
+  const [isDisabled, setIsDisabled] = useState(true);
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0]; // Get the first file
+    if (file) {
+      setFileName(file.name); // Set the file name to state
+
+      if (file.name === "") {
+        setIsDisabled(true);
+      } else {
+        setIsDisabled(false);
+      }
+    }
+  };
+
   return (
     <div className="p-1 md:p-8">
-      <h2 class="text-2xl font-semibold text-gray-700 hover:text-gray-500 transition-colors duration-300 text-center my-5">
-        Order Form
-      </h2>
+      <Form method="POST">
+        {onStartScreen ? (
+          <div className="max-w-72 mx-auto">
+            <img
+              src="https://robohash.org/2E0.png?set=set1"
+              className="my-5 mx-auto border"
+            />
+            <button
+              onClick={() => {
+                setOnStartScreen(false);
+                setOnUploadScreen(true);
+              }}
+              className="border p-3 rounded hover:text-gray-500"
+            >
+              Start order
+            </button>
+          </div>
+        ) : null}
+        {onUploadScreen ? (
+          <div className="max-w-72 mx-auto flex items-center justify-center h-96">
+            <div className="flex flex-col items-center my-5">
+              {/* Label to style the file input button */}
+              <label
+                htmlFor="file-upload"
+                className="cursor-pointer text-white bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 rounded-md px-4 py-2 mb-2 text-2xl"
+              >
+                Choose File
+              </label>
+              {/* Hidden file input */}
+              <input
+                type="file"
+                id="file-upload"
+                className="hidden"
+                onChange={handleFileChange}
+              />
 
-      <form
-        method="post"
-        className="p-6 max-w-sm mx-auto bg-form-gray rounded-lg space-y-4"
-      >
-        <label htmlFor="link" className="block text-gray-700 font-semibold">
-          Link:
-        </label>
-        <input
-          id="link"
-          name="link"
-          type="url"
-          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-        />
-        <div className="flex items-center">
-          <input
-            id="print-whole-doc"
-            name="printWholeDoc"
-            type="checkbox"
-            className="h-5 w-5 text-indigo-600 border-gray-300 rounded focus:ring-gray-500"
-          />
-          <label
-            htmlFor="print-whole-doc"
-            className="ml-2 text-gray-700 font-semibold"
+              {fileName && (
+                <p className="mt-2 text-md text-gray-700">
+                  Selected File: <span className="text-black">{fileName}</span>
+                </p>
+              )}
+              <div className="flex justify-between g-6 p-4">
+                <button
+                  onClick={() => {
+                    setOnStartScreen(true);
+                    setOnUploadScreen(false);
+                  }}
+                  className="border p-3 rounded hover:text-gray-500 mt-5 mx-5"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={() => {
+                    setOnUploadScreen(false);
+                    setOnPagesScreen(true);
+                  }}
+                  disabled={isDisabled}
+                  className="border p-3 rounded hover:text-gray-500 mt-5 mx-5 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
+        {onPagesScreen ? (
+          <div className="max-w-72 mx-auto flex items-center justify-center h-96">
+            <img
+              src="https://robohash.org/2E0.png?set=set1"
+              className="my-5 mx-auto border"
+            />
+          </div>
+        ) : null}
+        {onSummaryScreen ? (
+          <button
+            type="submit"
+            className="border p-3 rounded hover:text-gray-500"
           >
-            Print the whole document
-          </label>
-        </div>
-        <label
-          htmlFor="num-copies"
-          className="block text-gray-700 font-semibold"
-        >
-          Number of copies:
-        </label>
-        <input
-          id="num-copies"
-          name="numCopies"
-          type="number"
-          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-        />
-        <button type="submit" className="border p-3 rounded bg-green-400">
-          place order
-        </button>
-      </form>
+            Complete order
+          </button>
+        ) : null}
+      </Form>
     </div>
   );
 }
