@@ -1,7 +1,17 @@
 import { useState } from "react";
-import { Form } from "react-router-dom";
+import { Form, useLoaderData, useNavigate } from "react-router-dom";
+
+export const loader = async () => {
+  const res = await fetch("/api/user");
+  const { loggedIn } = await res.json();
+
+  return { loggedIn };
+};
 
 export default function OrderComponent() {
+  const navigate = useNavigate();
+  const { loggedIn } = useLoaderData();
+
   const [onStartScreen, setOnStartScreen] = useState(true);
   const [onUploadScreen, setOnUploadScreen] = useState(false);
   const [onPagesScreen, setOnPagesScreen] = useState(false);
@@ -34,6 +44,10 @@ export default function OrderComponent() {
             />
             <button
               onClick={() => {
+                if (!loggedIn) {
+                  navigate("/login");
+                }
+
                 setOnStartScreen(false);
                 setOnUploadScreen(true);
               }}
