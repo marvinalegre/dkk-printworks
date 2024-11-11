@@ -56,54 +56,39 @@ export default function Login() {
         </ul>
       </nav>
 
-      <div className="p-1 md:p-8">
-        <h2 class="text-2xl font-semibold text-gray-700 hover:text-gray-500 transition-colors duration-300 text-center my-5">
-          Login
-        </h2>
-
+      <div className="p-2 md:p-8 mt-[15vh] md:mt-[10vh]">
         <Form
           method="post"
-          className="p-6 max-w-sm mx-auto bg-form-gray rounded-lg space-y-4"
+          className="px-4 py-8 max-w-sm mx-auto bg-form-gray rounded-lg space-y-4 md:p-8"
         >
           {actionData ? (
             <p className="p-4 text-red-500">{actionData.err}</p>
           ) : null}
 
-          <label
-            htmlFor="username"
-            className="block text-gray-700 font-semibold"
-          >
-            username:
-          </label>
           <input
             autoComplete="off"
-            id="username"
             name="username"
             minLength={3}
             maxLength={20}
             required
+            placeholder="Username"
             className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
           />
-          <label
-            htmlFor="password"
-            className="block text-gray-700 font-semibold"
-          >
-            password:
-          </label>
           <input
             id="password"
             name="password"
             type="password"
             minLength={12}
             required
+            placeholder="Password"
             className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
           />
           <div className="mt-8 space-x-6 text-right">
             <button
               type="submit"
-              className="rounded bg-sky-700 px-4 py-2 text-sm font-medium text-white hover:bg-sky-600 w-full"
+              className="rounded bg-sky-700 px-4 py-2 text-xl font-medium text-white hover:bg-sky-600 w-full"
             >
-              login
+              log in
             </button>
           </div>
         </Form>

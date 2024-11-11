@@ -50,58 +50,43 @@ export default function SignUp() {
         <ul className="flex text-gray-300 space-x-8 ml-10 text-xl">
           <li>
             <Link to="/login" className="py-1 text-black">
-              login
+              log in
             </Link>
           </li>
         </ul>
       </nav>
 
-      <div className="p-1 md:p-8">
-        <h2 class="text-2xl font-semibold text-gray-700 hover:text-gray-500 transition-colors duration-300 text-center my-5">
-          Sign Up
-        </h2>
-
+      <div className="p-2 md:p-8 mt-[15vh] md:mt-[10vh]">
         <Form
           method="post"
-          className="p-6 max-w-sm mx-auto bg-form-gray rounded-lg space-y-4"
+          className="px-4 py-8 max-w-sm mx-auto bg-form-gray rounded-lg space-y-4 md:p-8"
         >
           {actionData ? (
             <p className="p-4 text-red-500">{actionData.err}</p>
           ) : null}
 
-          <label
-            htmlFor="username"
-            className="block text-gray-700 font-semibold"
-          >
-            username:
-          </label>
           <input
             id="username"
             name="username"
             minLength={3}
             maxLength={20}
             required
+            placeholder="Username"
             className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
           />
-          <br />
-          <label
-            htmlFor="password"
-            className="block text-gray-700 font-semibold"
-          >
-            password:
-          </label>
           <input
             id="password"
             name="password"
             type="password"
             minLength={12}
             required
+            placeholder="Password"
             className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
           />
           <br />
           <button
             type="submit"
-            className="rounded bg-sky-700 px-4 py-2 text-sm font-medium text-white hover:bg-sky-600 w-full"
+            className="rounded bg-sky-700 px-4 py-2 text-xl font-medium text-white hover:bg-sky-600 w-full"
           >
             sign up
           </button>

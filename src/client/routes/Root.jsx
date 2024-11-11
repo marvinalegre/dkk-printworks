@@ -20,7 +20,7 @@ export default function Root() {
           {loggedIn ? null : (
             <li>
               <Link to="login" className="py-1 text-black">
-                login
+                log in
               </Link>
             </li>
           )}
@@ -31,7 +31,7 @@ export default function Root() {
               </Link>
               {" | "}
               <Link to="logout" className="py-1 text-black">
-                logout
+                log out
               </Link>
             </li>
           ) : null}
