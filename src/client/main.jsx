@@ -14,7 +14,8 @@ import SignUpPage, {
   action as signUpPageAction,
   loader as signUpPageLoader,
 } from "./routes/SignUpPage";
-import OrderForm, { loader as orderFormLoader } from "./components/OrderForm";
+import Index, { loader as indexLoader } from "./routes/Index";
+import OrderForm from "./components/OrderForm";
 
 const router = createBrowserRouter(
   [
@@ -23,12 +24,9 @@ const router = createBrowserRouter(
       element: <Root />,
       loader: rootLoader,
       children: [
-        { index: true, element: <OrderForm />, loader: orderFormLoader },
-        {
-          path: "/marvinalegre",
-          element: <p className="p-8">under construction</p>,
-        },
+        { index: true, element: <Index />, loader: indexLoader },
         { path: "/logout", element: <LogoutPage />, loader: logoutPageLoader },
+        { path: "/order", element: <OrderForm /> },
       ],
     },
     {
