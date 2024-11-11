@@ -33,12 +33,14 @@ app.post("/api/login", async (req, res) => {
       success: false,
       err: "Invalid username",
     });
+    return;
   }
   if (password.length < 12) {
     res.json({
       success: false,
       err: "Password must be at least 12 characters",
     });
+    return;
   }
 
   const data = await getHashAndJwtId(username);
@@ -51,6 +53,7 @@ app.post("/api/login", async (req, res) => {
         success: false,
         err: "Invalid username or password",
       });
+      return;
     }
 
     // TODO: review algo confusion on jwts
@@ -85,6 +88,7 @@ app.post("/api/signup", async (req, res) => {
       success: false,
       err: "Invalid username",
     });
+    return;
   }
 
   const data = await getHashAndJwtId(username);
@@ -94,6 +98,7 @@ app.post("/api/signup", async (req, res) => {
       success: false,
       err: "Username is not available",
     });
+    return;
   }
 
   if (password.length < 12) {
@@ -101,6 +106,7 @@ app.post("/api/signup", async (req, res) => {
       success: false,
       err: "Password must be at least 12 characters",
     });
+    return;
   }
 
   // TODO: add weak password filter, entrophy detector
@@ -117,6 +123,7 @@ app.post("/api/signup", async (req, res) => {
       success: false,
       err: "Something went wrong",
     });
+    return;
   }
 
   const token = jwt.sign({ id: jwtId }, process.env.JWT_SECRET, {
