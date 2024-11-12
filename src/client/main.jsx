@@ -16,6 +16,7 @@ import SignUpPage, {
 } from "./routes/SignUpPage";
 import Index from "./routes/Index";
 import OrderForm, { loader as orderFormLoader } from "./components/OrderForm";
+import { action as uploadFile } from "./components/FileUpload";
 
 const router = createBrowserRouter(
   [
@@ -40,6 +41,10 @@ const router = createBrowserRouter(
       element: <SignUpPage />,
       action: signUpPageAction,
       loader: signUpPageLoader,
+    },
+    {
+      path: "/upload",
+      action: uploadFile,
     },
   ],
   {

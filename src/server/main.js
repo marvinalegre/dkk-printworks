@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
+import formidable from "formidable";
 
 import jwtAuthenticator from "./middlewares/jwtAuthenticator.js";
 import { getUsername, getHashAndJwtId, insertUser } from "./utils/db.js";
@@ -18,6 +19,17 @@ app.use(express.json());
 app.use("/api", cookieParser());
 app.use("/api", jwtAuthenticator());
 
+app.post("/api/upload", async (req, res) => {
+  const form = formidable({});
+
+  form.parse(req, (err, fields, files) => {
+    if (err) {
+      next(err);
+      return;
+    }
+    res.json({ fields, files });
+  });
+});
 app.get("/api/user", async (req, res) => {
   if (req.jwtId) {
     res.json({ username: await getUsername(req.jwtId), loggedIn: true });
