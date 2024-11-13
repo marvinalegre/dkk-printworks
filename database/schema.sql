@@ -35,15 +35,15 @@ CREATE TABLE profile_pictures (
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
-DROP TABLE IF EXISTS uploads;
-CREATE TABLE uploads (
-    upload_id INTEGER PRIMARY KEY AUTOINCREMENT,  
+DROP TABLE IF EXISTS files;
+CREATE TABLE files (
+    file_id INTEGER PRIMARY KEY AUTOINCREMENT,  
     user_id INTEGER NOT NULL,                      
     file_name TEXT NOT NULL,                       
     file_path TEXT NOT NULL,                       
     file_size INTEGER NOT NULL,                    
     num_pages INTEGER NOT NULL,                       
-    upload_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
+    file_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
     FOREIGN KEY (user_id) REFERENCES users(user_id)  
 );
 
@@ -51,13 +51,13 @@ DROP TABLE IF EXISTS orders;
 CREATE TABLE orders (
     order_id INTEGER PRIMARY KEY AUTOINCREMENT,         
     user_id INTEGER NOT NULL,                           
-    upload_id INTEGER NOT NULL,                         
+    file_id INTEGER NOT NULL,                         
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status TEXT CHECK( status IN ('Pending', 'In Progress', 'Completed', 'Cancelled') ) NOT NULL DEFAULT 'Pending', 
     special_instructions TEXT,                          
     total_price DECIMAL(10, 2) NOT NULL,                 
     FOREIGN KEY (user_id) REFERENCES users(user_id),    
-    FOREIGN KEY (upload_id) REFERENCES uploads(upload_id) 
+    FOREIGN KEY (file_id) REFERENCES files(file_id) 
 );
 
 DROP TABLE IF EXISTS page_ranges;
