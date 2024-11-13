@@ -52,14 +52,22 @@ CREATE TABLE orders (
     order_id INTEGER PRIMARY KEY AUTOINCREMENT,         
     user_id INTEGER NOT NULL,                           
     upload_id INTEGER NOT NULL,                         
-    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,     
-    quantity INTEGER NOT NULL DEFAULT 1,                 
-    paper_size TEXT CHECK( paper_size IN ('A4', 'Short', 'Long') ) NOT NULL DEFAULT 'Short',  
-    color_mode TEXT CHECK( color_mode IN ('Color', 'Black & White') ) NOT NULL DEFAULT 'Black & White', 
-    duplex TEXT CHECK( duplex IN ('Single-sided', 'Double-sided') ) NOT NULL DEFAULT 'Single-sided', 
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status TEXT CHECK( status IN ('Pending', 'In Progress', 'Completed', 'Cancelled') ) NOT NULL DEFAULT 'Pending', 
     special_instructions TEXT,                          
     total_price DECIMAL(10, 2) NOT NULL,                 
     FOREIGN KEY (user_id) REFERENCES users(user_id),    
     FOREIGN KEY (upload_id) REFERENCES uploads(upload_id) 
+);
+
+DROP TABLE IF EXISTS page_ranges;
+CREATE TABLE page_ranges (
+    page_range_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id INTEGER NOT NULL,
+    page_range TEXT NOT NULL,
+    copies INTEGER NOT NULL DEFAULT 1,                 
+    paper_size TEXT CHECK( paper_size IN ('A4', 'Short', 'Long') ) NOT NULL DEFAULT 'Short',  
+    color TEXT CHECK( color IN ('Colored', 'Black & White') ) NOT NULL DEFAULT 'Black & White', 
+    duplex TEXT CHECK( duplex IN ('Single-sided', 'Double-sided') ) NOT NULL DEFAULT 'Single-sided',
+    FOREIGN KEY (order_id) REFERENCES orders(order_id)
 );
