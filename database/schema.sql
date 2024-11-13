@@ -42,7 +42,7 @@ CREATE TABLE uploads (
     file_name TEXT NOT NULL,                       
     file_path TEXT NOT NULL,                       
     file_size INTEGER NOT NULL,                    
-    file_type TEXT NOT NULL,                       
+    num_pages INTEGER NOT NULL,                       
     upload_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
     FOREIGN KEY (user_id) REFERENCES users(user_id)  
 );
