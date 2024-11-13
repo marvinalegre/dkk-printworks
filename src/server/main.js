@@ -58,9 +58,9 @@ app.post("/api/login", async (req, res) => {
   const data = await getHashAndJwtId(username);
 
   if (data) {
-    const { hashedPassword, jwtId } = data;
+    const { passwordHash, jwtId } = data;
 
-    if (!bcrypt.compareSync(password, hashedPassword)) {
+    if (!bcrypt.compareSync(password, passwordHash)) {
       res.json({
         success: false,
         err: "Invalid username or password",
@@ -124,11 +124,11 @@ app.post("/api/signup", async (req, res) => {
   // TODO: add weak password filter, entrophy detector
 
   // TODO: check in profiler if this is a hotspot
-  const hashedPassword = bcrypt.hashSync(password, 8);
+  const passwordHash = bcrypt.hashSync(password, 8);
   const jwtId = `u-${uuidv4()}`;
 
   try {
-    await insertUser(username, hashedPassword, jwtId);
+    await insertUser(username, passwordHash, jwtId);
   } catch (err) {
     console.log(err);
     res.json({
