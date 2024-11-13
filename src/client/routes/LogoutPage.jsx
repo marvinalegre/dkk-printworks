@@ -5,7 +5,7 @@ export async function loader() {
   const { success } = await res.json();
 
   if (success) {
-    return redirect("/");
+    return redirect("/login");
   }
 
   return null;
