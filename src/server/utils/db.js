@@ -7,7 +7,7 @@ export async function getNewOrder(userId) {
   const output = db
     .prepare(
       `
-      select order_date, file_name, page_range, copies, color, paper_size from users
+      select order_reference_number, file_name, page_range, copies, color, paper_size from users
       left join orders on users.user_id = orders.order_id
       left join files on orders.order_id = files.order_id
       left join page_ranges on files.file_id = page_ranges.file_id
