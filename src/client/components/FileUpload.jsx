@@ -27,7 +27,9 @@ function FileUpload({ numFiles }) {
   };
 
   return (
-    <div className="w-full max-w-xl py-2 bg-white rounded-lg border shadow-md m-auto mt-10">
+    <div
+      className={`w-full max-w-xl py-2 rounded m-auto mt-10 mb-10 md:mt-[6vh]`}
+    >
       {/* File upload button */}
       <Form
         method="POST"
