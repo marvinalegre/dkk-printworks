@@ -21,7 +21,8 @@ CREATE TABLE users (
 DROP TABLE IF EXISTS orders;
 CREATE TABLE orders (
     order_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,                           
+    user_id INTEGER NOT NULL,
+    order_reference_number TEXT NOT NULL UNIQUE,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status TEXT CHECK( status IN ('New', 'Pending', 'In Progress', 'Completed', 'Cancelled') ) NOT NULL DEFAULT 'New', 
     special_instructions TEXT,                          
