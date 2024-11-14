@@ -9,7 +9,13 @@ import { v4 as uuidv4 } from "uuid";
 import formidable from "formidable";
 
 import jwtAuthenticator from "./middlewares/jwtAuthenticator.js";
-import { getUsername, getHashAndJwtId, insertUser } from "./utils/db.js";
+import {
+  getHashAndJwtId,
+  getNewOrder,
+  getUserId,
+  getUsername,
+  insertUser,
+} from "./utils/db.js";
 import { validUsername } from "../utils/validation.js";
 
 const app = express();
@@ -19,6 +25,21 @@ app.use(express.json());
 app.use("/api", cookieParser());
 app.use("/api", jwtAuthenticator());
 
+app.get("/api/order", async (req, res) => {
+  if (!req.jwtId) {
+    res.status(401).json({ err: "unauthorized" });
+    return;
+  }
+
+  const userId = await getUserId(req.jwtId);
+
+  if (!userId) {
+    res.status(401).json({ err: "unauthorized" });
+    return;
+  }
+
+  res.json(await getNewOrder(userId));
+});
 app.post("/api/upload", async (req, res) => {
   const form = formidable({});
 

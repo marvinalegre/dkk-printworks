@@ -1,5 +1,42 @@
 import Database from "better-sqlite3";
 
+export async function getNewOrder(userId) {
+  const db = new Database(`${process.cwd()}/db.sql`);
+  db.pragma("journal_mode = WAL");
+
+  const output = db
+    .prepare(
+      `
+      select order_date, file_name, page_range, copies, color, paper_size from users
+      left join orders on users.user_id = orders.order_id
+      left join files on orders.order_id = files.order_id
+      left join page_ranges on files.file_id = page_ranges.file_id
+      where orders.status = 'New'
+      and users.user_id = ?
+      order by file_name, page_ranges.page_range_timestamp;
+      `
+    )
+    .bind(userId)
+    .all();
+
+  db.close();
+
+  return output;
+}
+
+export async function getUserId(jwtId) {
+  const db = new Database(`${process.cwd()}/db.sql`);
+  db.pragma("journal_mode = WAL");
+
+  const row = db
+    .prepare("select user_id from users where jwt_id = ?")
+    .get(jwtId);
+
+  db.close();
+
+  return row?.user_id;
+}
+
 export async function getUsername(jwtId) {
   const db = new Database(`${process.cwd()}/db.sql`);
   db.pragma("journal_mode = WAL");
