@@ -12,7 +12,7 @@ export const action = async ({ request }) => {
   return redirect("/");
 };
 
-function FileUpload({ numFiles }) {
+function FileUpload() {
   // State to hold the selected file name
   const [fileName, setFileName] = useState("");
 
@@ -27,9 +27,19 @@ function FileUpload({ numFiles }) {
   };
 
   return (
-    <div
-      className={`w-full max-w-xl py-2 rounded m-auto mt-10 mb-10 md:mt-[6vh]`}
-    >
+    <div className="max-w-lg py-4 rounded m-auto mt-10 mb-10 md:mt-[6vh] bg-gray-100 shadow">
+      {/* Display selected file name */}
+      <div id="file-name" className="mb-5 text-center text-gray-500 text-lg">
+        {fileName ? (
+          <span>
+            <span className="italic">selected file</span>:{" "}
+            <span className="font-bold text-gray-700">{fileName}</span>
+          </span>
+        ) : (
+          <span className="italic">no file selected</span>
+        )}
+      </div>
+
       {/* File upload button */}
       <Form
         method="POST"
@@ -37,7 +47,7 @@ function FileUpload({ numFiles }) {
         encType="multipart/form-data"
         className="mt-2 flex md:gap-20 gap-2 justify-center items-center flex-wrap"
       >
-        <label className="rounded bg-sky-700 px-3 py-1 text-lg font-medium text-white hover:bg-sky-600 md:w-2/5 text-center">
+        <label className="rounded bg-sky-700 px-5 py-1 text-lg font-medium text-white hover:bg-sky-600 text-center">
           {fileName ? "select another file" : "select a file"}
           <input
             type="file"
@@ -48,24 +58,12 @@ function FileUpload({ numFiles }) {
         </label>
         <button
           type="submit"
-          className="rounded bg-sky-700 px-3 py-1 text-lg font-medium text-white hover:bg-sky-600 md:w-2/5 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded bg-sky-700 px-5 py-1 text-lg font-medium text-white hover:bg-sky-600 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-50"
           disabled={fileName ? false : true}
         >
           upload selected file
         </button>
       </Form>
-
-      {/* Display selected file name */}
-      <div id="file-name" className="mt-3 text-center text-gray-500 text-lg">
-        {fileName ? (
-          <span>
-            <span className="italic">selected file</span>:{" "}
-            <span className="font-bold text-gray-700">{fileName}</span>
-          </span>
-        ) : (
-          <span className="italic">no file selected</span>
-        )}
-      </div>
     </div>
   );
 }

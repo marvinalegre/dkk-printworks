@@ -264,7 +264,7 @@ function FileForm({ file }) {
       {pages === "custom" ? (
         <button
           type="button"
-          className="rounded bg-sky-700 px-3 py-1 text-lg font-medium text-white hover:bg-sky-600 w-full text-center"
+          className="rounded bg-sky-700 px-5 py-1 m-auto text-lg font-medium text-white hover:bg-sky-600 text-center"
         >
           add page range
         </button>
