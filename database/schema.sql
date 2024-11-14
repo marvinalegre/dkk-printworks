@@ -50,7 +50,6 @@ CREATE TABLE files (
 DROP TABLE IF EXISTS orders;
 CREATE TABLE orders (
     order_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    order_reference_number TEXT NOT NULL UNIQUE,
     user_id INTEGER NOT NULL,                           
     file_id INTEGER NOT NULL,                         
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
