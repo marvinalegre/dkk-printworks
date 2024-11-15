@@ -27,7 +27,7 @@ CREATE TABLE orders (
     status TEXT CHECK( status IN ('New', 'Pending', 'In Progress', 'Completed', 'Cancelled') ) NOT NULL DEFAULT 'New', 
     special_instructions TEXT,                          
     total_price DECIMAL(10, 2) NOT NULL,                 
-    FOREIGN KEY (user_id) REFERENCES users(user_id),    
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 DROP TABLE IF EXISTS files;
