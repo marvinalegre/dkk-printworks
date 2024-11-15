@@ -3,33 +3,16 @@ import FileUpload from "./FileUpload";
 import { useState } from "react";
 
 export const loader = async () => {
-  const res = await fetch("/api/user");
-  const { loggedIn } = await res.json();
+  const [{ loggedIn }, order] = await Promise.all([
+    (await fetch("/api/user")).json(),
+    (await fetch("/api/order")).json(),
+  ]);
 
   if (!loggedIn) {
     return redirect("/login");
-  } else {
-    return {
-      orderRefNumber: "o-bd2aae2b-27fd-4ab0-98b7-6eac99b8d4bd",
-      files: [
-        {
-          name: "resume.pdf",
-          numPages: 2,
-          pageRanges: [
-            { pageRange: "1-2", copies: 1, color: "c", pageSize: "short" },
-          ],
-        },
-        {
-          name: "hackers-and-painters.pdf",
-          numPages: 348,
-          pageRanges: [
-            { pageRange: "1-5", copies: 1, color: "bw", pageSize: "short" },
-            { pageRange: "20-26", copies: 1, color: "bw", pages: "short" },
-          ],
-        },
-      ],
-    };
   }
+
+  return order;
 };
 
 export default function OrderComponent() {
@@ -68,24 +51,24 @@ export default function OrderComponent() {
         {files.map((file, rowIndex) => (
           <FileForm key={rowIndex} file={file} />
         ))}
-
-        <div className="flex justify-center items-center max-w-sm m-auto my-5">
-          <button
-            onClick={() => {
-              submit(document.getElementById("foo"));
-            }}
-            className={`${
-              files.length ? "" : "hidden"
-            } rounded bg-sky-500 px-4 py-2 text-xl font-medium text-white hover:bg-sky-600 w-full`}
-            value="asdf"
-            name="bin"
-          >
-            complete order
-          </button>
-        </div>
       </Form>
 
       <FileUpload numFiles={files.length} />
+
+      <div className="flex justify-center items-center max-w-sm m-auto my-5">
+        <button
+          onClick={() => {
+            submit(document.getElementById("foo"));
+          }}
+          className={`${
+            files.length ? "" : "hidden"
+          } rounded bg-sky-500 px-4 py-2 text-xl font-medium text-white hover:bg-sky-600 w-full`}
+          value="asdf"
+          name="bin"
+        >
+          complete order
+        </button>
+      </div>
     </div>
   );
 }

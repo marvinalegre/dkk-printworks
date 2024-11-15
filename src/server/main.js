@@ -15,6 +15,7 @@ import {
   getUserId,
   getUsername,
   insertUser,
+  createNewOrder,
 } from "./utils/db.js";
 import { validUsername } from "../utils/validation.js";
 
@@ -38,7 +39,51 @@ app.get("/api/order", async (req, res) => {
     return;
   }
 
-  res.json(await getNewOrder(userId));
+  let pageRanges = await getNewOrder(userId);
+
+  if (!pageRanges.length) {
+    await createNewOrder(userId, `o-${uuidv4()}`);
+    pageRanges = await getNewOrder(userId);
+  }
+
+  function rangesToOrder(ranges) {
+    const order = {};
+
+    order.orderRefNumber = ranges[0].order_reference_number;
+    order.files = [];
+
+    if (ranges.length === 1 && ranges[0].file_name === null) return order;
+
+    let fileNames = new Set();
+    for (let range of ranges) {
+      fileNames.add(range.file_name);
+    }
+
+    for (let fileName of fileNames) {
+      let file = {};
+      file.name = fileName;
+      file.pageRanges = [];
+      for (let range of ranges) {
+        if (range.file_name === fileName) {
+          file.numPages = range.num_pages;
+          range.pageRange = range.page_range;
+          range.pageSize = range.paper_size;
+          delete range.paper_size;
+          delete range.page_range;
+          delete range.file_name;
+          delete range.order_reference_number;
+          delete range.num_pages;
+          file.pageRanges.push(range);
+        }
+      }
+
+      order.files.push(file);
+    }
+
+    return order;
+  }
+
+  res.json(rangesToOrder(pageRanges));
 });
 app.post("/api/upload", async (req, res) => {
   const form = formidable({});

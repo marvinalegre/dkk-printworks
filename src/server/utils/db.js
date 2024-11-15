@@ -1,5 +1,20 @@
 import Database from "better-sqlite3";
 
+export async function createNewOrder(userId, orderRefNumber) {
+  const db = new Database(`${process.cwd()}/db.sql`);
+  db.pragma("journal_mode = WAL");
+
+  const info = db
+    .prepare(
+      "insert into orders (user_id, order_reference_number, status, special_instructions, total_price) values (?, ?, ?, ?, ?)"
+    )
+    .run(userId, orderRefNumber, "New", null, 0);
+
+  if (info.changes !== 1) throw "new order was not created";
+
+  db.close();
+}
+
 export async function getNewOrder(userId) {
   const db = new Database(`${process.cwd()}/db.sql`);
   db.pragma("journal_mode = WAL");
@@ -7,7 +22,7 @@ export async function getNewOrder(userId) {
   const output = db
     .prepare(
       `
-      select order_reference_number, file_name, page_range, copies, color, paper_size from orders
+      select order_reference_number, file_name, num_pages, page_range, copies, color, paper_size from orders
       left join files on orders.order_id = files.order_id
       left join page_ranges on files.file_id = page_ranges.file_id
       where orders.status = 'New'
