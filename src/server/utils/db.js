@@ -7,13 +7,12 @@ export async function getNewOrder(userId) {
   const output = db
     .prepare(
       `
-      select order_reference_number, file_name, page_range, copies, color, paper_size from users
-      left join orders on users.user_id = orders.order_id
+      select order_reference_number, file_name, page_range, copies, color, paper_size from orders
       left join files on orders.order_id = files.order_id
       left join page_ranges on files.file_id = page_ranges.file_id
       where orders.status = 'New'
-      and users.user_id = ?
-      order by file_name, page_ranges.page_range_timestamp;
+      and user_id = ?
+      order by file_timestamp, page_range_timestamp;
       `
     )
     .bind(userId)
