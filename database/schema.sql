@@ -36,7 +36,7 @@ CREATE TABLE files (
     file_id INTEGER PRIMARY KEY AUTOINCREMENT, 
     order_id INTEGER NOT NULL,
     file_name TEXT NOT NULL,
-    internal_file_name TEXT NOT NULL,
+    internal_file_name TEXT NOT NULL UNIQUE,
     file_size INTEGER NOT NULL,
     num_pages INTEGER NOT NULL,
     -- 0.66 to 1
