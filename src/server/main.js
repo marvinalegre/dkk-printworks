@@ -87,14 +87,25 @@ app.get("/api/order", async (req, res) => {
 });
 app.post("/api/upload", async (req, res) => {
   const form = formidable({});
+  const getFileAndOrderRefNum = function (form) {
+    return new Promise((resolve, reject) => {
+      form.parse(req, (err, fields, files) => {
+        if (err) {
+          reject(err);
+          return;
+        }
 
-  form.parse(req, (err, fields, files) => {
-    if (err) {
-      next(err);
-      return;
-    }
-    res.json({ fields, files });
-  });
+        resolve({
+          orderRefNumber: fields.orderRefNumber[0],
+          file: files.upload[0],
+        });
+      });
+    });
+  };
+
+  const { orderRefNumber, file } = await getFileAndOrderRefNum(form);
+
+  res.send("hit");
 });
 app.get("/api/user", async (req, res) => {
   if (req.jwtId) {

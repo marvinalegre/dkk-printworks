@@ -53,7 +53,7 @@ export default function OrderComponent() {
         ))}
       </Form>
 
-      <FileUpload numFiles={files.length} />
+      <FileUpload orderRefNumber={orderRefNumber} />
 
       <div className="flex justify-center items-center max-w-sm m-auto my-5">
         <button

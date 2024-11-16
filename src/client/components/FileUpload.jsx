@@ -9,10 +9,10 @@ export const action = async ({ request }) => {
     body: formData,
   });
 
-  return redirect("/");
+  return redirect("/order");
 };
 
-function FileUpload() {
+function FileUpload({ orderRefNumber }) {
   // State to hold the selected file name
   const [fileName, setFileName] = useState("");
 
@@ -47,11 +47,16 @@ function FileUpload() {
         encType="multipart/form-data"
         className="mt-2 flex md:gap-20 gap-2 justify-center items-center flex-wrap"
       >
+        <input
+          name="orderRefNumber"
+          defaultValue={orderRefNumber}
+          className="hidden"
+        ></input>
         <label className="rounded bg-sky-700 px-5 py-1 text-lg font-medium text-white hover:bg-sky-600 text-center">
           {fileName ? "select another file" : "select a file"}
           <input
             type="file"
-            name="foobar"
+            name="upload"
             className="hidden"
             onChange={handleFileChange}
           />
