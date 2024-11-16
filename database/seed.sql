@@ -24,7 +24,8 @@ CREATE TABLE orders (
     user_id INTEGER NOT NULL,
     order_reference_number TEXT NOT NULL UNIQUE,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    status TEXT CHECK( status IN ('New', 'Pending', 'In Progress', 'Completed', 'Cancelled') ) NOT NULL DEFAULT 'New', 
+    -- n, New | pe, Pending | pr, In Progress | co, Completed | ca, Cancelled
+    status TEXT CHECK( status IN ('n', 'pe', 'pr', 'co', 'ca') ) NOT NULL DEFAULT 'n', 
     special_instructions TEXT,                          
     total_price DECIMAL(10, 2) NOT NULL,                 
     FOREIGN KEY (user_id) REFERENCES users(user_id)
@@ -38,6 +39,13 @@ CREATE TABLE files (
     internal_file_name TEXT NOT NULL,
     file_size INTEGER NOT NULL,
     num_pages INTEGER NOT NULL,
+    -- 0.66 to 1
+    -- sample entry: '1,2-5,7,9'
+    full_color_pages TEXT,
+    -- 0.33 to 0.66
+    mid_color_pages TEXT,
+    -- 0.01 to 0.33
+    spot_color_pages TEXT,
     file_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (order_id) REFERENCES orders(order_id)
 );
@@ -47,19 +55,22 @@ CREATE TABLE page_ranges (
     page_range_id INTEGER PRIMARY KEY AUTOINCREMENT,
     file_id INTEGER NOT NULL,
     page_range TEXT NOT NULL,
-    copies INTEGER NOT NULL DEFAULT 1,                 
-    paper_size TEXT CHECK( paper_size IN ('A4', 'Short', 'Long') ) NOT NULL DEFAULT 'Short',  
-    color TEXT CHECK( color IN ('Colored', 'Black & White') ) NOT NULL DEFAULT 'Black & White', 
-    duplex TEXT CHECK( duplex IN ('Single-sided', 'Double-sided') ) NOT NULL DEFAULT 'Single-sided',
+    copies INTEGER NOT NULL DEFAULT 1,
+    -- a, A4 | s, Short | l, Long
+    paper_size TEXT CHECK( paper_size IN ('a', 's', 'l') ) NOT NULL DEFAULT 's',
+    -- c, Colored | b, Black and White
+    color TEXT CHECK( color IN ('c', 'b') ) NOT NULL DEFAULT 'b', 
+    -- s, Single-sided | d, Double-sided
+    duplex TEXT CHECK( duplex IN ('s', 'd') ) NOT NULL DEFAULT 's',
     page_range_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (file_id) REFERENCES files(file_id)
 );
 
 
-INSERT INTO roles (role_name) VALUES 
-('Registered User'),
-('Admin'),
-('Super Admin');
+INSERT INTO roles (role_id, role_name) VALUES 
+(1, 'Registered User'),
+(2, 'Admin'),
+(3, 'Super Admin');
 
 INSERT INTO users (jwt_id, username, display_name, email, password_hash, role_id, created_at, updated_at) VALUES 
 ('u-1a1aae2b-27fd-4ab0-98b7-6eac99b8d4bd', 'marvin', NULL, NULL, '$2a$08$l6OdwGLE.MIcDRd8f2ZB9OyQejLdBP3ImCg.TWpmiAs.tZM22stxm', 3, '2024-11-15 08:52:18', '2024-11-15 08:52:18'),
@@ -70,10 +81,10 @@ INSERT INTO users (jwt_id, username, display_name, email, password_hash, role_id
 
 INSERT INTO orders (user_id, order_reference_number, status, special_instructions, total_price, order_date) VALUES 
 -- total_price was computed at 3pesos per page (short)
-(1, 'o-d1e12406-996e-4266-a62d-21940568fa73', 'New', NULL, 6, '2024-11-15 08:56:48');
+(1, 'o-d1e12406-996e-4266-a62d-21940568fa73', 'n', NULL, 6, '2024-11-15 08:56:48');
 
-INSERT INTO files (order_id, file_name, internal_file_name, file_size, num_pages, file_timestamp) VALUES 
-(1, 'resumé.pdf', 'fooa8f01312f4df940567c800', 62385, 1, '2024-11-15 08:58:00');
+INSERT INTO files (order_id, file_name, internal_file_name, file_size, num_pages, file_timestamp, full_color_pages, mid_color_pages, spot_color_pages) VALUES 
+(1, 'resumé.pdf', 'fooa8f01312f4df940567c800', 62385, 1, '2024-11-15 08:58:00', NULL, NULL, '1');
 
 INSERT INTO page_ranges (file_id, page_range, copies, paper_size, color, duplex, page_range_timestamp) VALUES 
-(1, '1', 2, 'Short', 'Black & White', 'Single-sided', '2024-11-15 08:58:00');
+(1, '1', 2, 's', 'b', 's', '2024-11-15 08:58:00');
