@@ -1,6 +1,5 @@
 import "dotenv/config";
 import reservedUsernames from "../utils/reserved-usernames.json" assert { type: "json" };
-
 import express from "express";
 import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
@@ -22,6 +21,7 @@ import { validUsername } from "../utils/validation.js";
 const app = express();
 const port = 8788;
 
+app.use(express.static(`${process.cwd()}/dist`));
 app.use(express.json());
 app.use("/api", cookieParser());
 app.use("/api", jwtAuthenticator());
@@ -216,6 +216,9 @@ app.post("/api/signup", async (req, res) => {
   });
 
   res.json({ success: true });
+});
+app.use((req, res) => {
+  res.sendFile(`${process.cwd()}/dist/index.html`);
 });
 
 app.listen(port, () => {
