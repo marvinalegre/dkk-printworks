@@ -52,3 +52,27 @@ export async function getPdfPageCount(pdfPath) {
     return null; // Return null if there's an error
   }
 }
+
+export function getPdfPageSize(filename) {
+  return new Promise((resolve, reject) => {
+    // Run the pdfinfo command to get PDF metadata
+    exec(`pdfinfo "${filename}"`, (error, stdout, stderr) => {
+      if (error || stderr) {
+        reject(`Error executing pdfinfo: ${error || stderr}`);
+        return;
+      }
+
+      // Extract page size from the output
+      const pageSizeMatch = stdout.match(
+        /Page size:\s*(\d+(\.\d+)?)\s*x\s*(\d+(\.\d+)?)/
+      );
+      if (pageSizeMatch) {
+        const width = parseFloat(pageSizeMatch[1]); // Capture width (supports integer and decimal)
+        const height = parseFloat(pageSizeMatch[3]); // Capture height (supports int
+        resolve([width, height]);
+      } else {
+        reject("Could not extract page size from PDF.");
+      }
+    });
+  });
+}

@@ -6,18 +6,26 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
 import formidable from "formidable";
-import { exec } from "child_process";
 
 import jwtAuthenticator from "./middlewares/jwtAuthenticator.js";
 import {
+  createNewOrder,
   getHashAndJwtId,
   getNewOrder,
   getUserId,
   getUsername,
   insertUser,
-  createNewOrder,
+  insertFile,
+  getOrderId,
+  insertPageRange,
 } from "./utils/db.js";
+import {
+  pdfToImage,
+  getPdfPageCount,
+  getPdfPageSize,
+} from "./utils/doc-processing.js";
 import { validUsername } from "../utils/validation.js";
+import { getBWPercentage } from "./utils/image-processing.js";
 
 const app = express();
 const port = 8788;
@@ -88,6 +96,8 @@ app.get("/api/order", async (req, res) => {
 });
 app.post("/api/upload", async (req, res) => {
   const form = formidable({});
+  form.uploadDir = `${process.cwd()}/files`;
+
   const getFileAndOrderRefNum = function (form) {
     return new Promise((resolve, reject) => {
       form.parse(req, (err, fields, files) => {
@@ -108,6 +118,63 @@ app.post("/api/upload", async (req, res) => {
     orderRefNumber,
     file: { newFilename, originalFilename, mimetype, size },
   } = await getFileAndOrderRefNum(form);
+
+  const numPages = await getPdfPageCount(
+    `${process.cwd()}/files/${newFilename}`
+  );
+  await pdfToImage(`${process.cwd()}/files/${newFilename}`, newFilename);
+
+  const fullColorPages = [];
+  const midColorPages = [];
+  const spotColorPages = [];
+  for (let i = 1; i <= numPages; i++) {
+    const percentage = await getBWPercentage(
+      `${process.cwd()}/files/${newFilename}-${i}.jpg`
+    );
+    if (percentage < 0.33) {
+      fullColorPages.push(i);
+    } else if (percentage < 0.66) {
+      midColorPages.push(i);
+    } else if (percentage < 0.95) {
+      spotColorPages.push(i);
+    }
+  }
+
+  const pageCount = await getPdfPageCount(
+    `${process.cwd()}/files/${newFilename}`
+  );
+
+  const rowid = await insertFile(
+    await getOrderId(orderRefNumber),
+    originalFilename,
+    newFilename,
+    size,
+    pageCount,
+    arrayToRangeString(fullColorPages),
+    arrayToRangeString(midColorPages),
+    arrayToRangeString(spotColorPages)
+  );
+
+  const [width, length] = await getPdfPageSize(
+    `${process.cwd()}/files/${newFilename}`
+  );
+  let paperSizeName;
+  if (594 < width && width < 597 && 840 < length && length < 843) {
+    paperSizeName = "a";
+  } else if (611 < width && width < 614 && 934 < length && length < 937) {
+    paperSizeName = "l";
+  } else if (611 < width && width < 614 && 791 < length && length < 793) {
+    paperSizeName = "s";
+  }
+
+  await insertPageRange(
+    rowid,
+    pageCount === 1 ? "1" : `1-${pageCount}`,
+    1,
+    paperSizeName ? paperSizeName : "s",
+    "b",
+    "s"
+  );
 
   res.send("hit");
 });
@@ -239,3 +306,47 @@ app.use((req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
+
+function parseRangeString(rangeStr) {
+  const result = [];
+  const ranges = rangeStr.split(",");
+
+  ranges.forEach((range) => {
+    if (range.includes("-")) {
+      // This is a range (e.g., '4-6')
+      const [start, end] = range.split("-").map(Number);
+      for (let i = start; i <= end; i++) {
+        result.push(i);
+      }
+    } else {
+      // This is a single number (e.g., '1')
+      result.push(Number(range));
+    }
+  });
+
+  return result;
+}
+
+function arrayToRangeString(arr) {
+  if (arr.length === 0) return null;
+
+  const result = [];
+  let rangeStart = arr[0];
+  let rangeEnd = arr[0];
+
+  for (let i = 1; i <= arr.length; i++) {
+    if (arr[i] === rangeEnd + 1) {
+      rangeEnd = arr[i];
+    } else {
+      if (rangeStart === rangeEnd) {
+        result.push(`${rangeStart}`);
+      } else {
+        result.push(`${rangeStart}-${rangeEnd}`);
+      }
+      rangeStart = arr[i];
+      rangeEnd = arr[i];
+    }
+  }
+
+  return result.join(",");
+}
