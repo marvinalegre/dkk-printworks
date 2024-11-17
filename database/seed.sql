@@ -12,8 +12,8 @@ CREATE TABLE users (
     display_name TEXT,
     email TEXT UNIQUE,
     password_hash TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')),
+    updated_at TIMESTAMP DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')),
     role_id INTEGER,
     FOREIGN KEY (role_id) REFERENCES roles(role_id)
 );
@@ -23,7 +23,7 @@ CREATE TABLE orders (
     order_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     order_reference_number TEXT NOT NULL UNIQUE,
-    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    order_date TIMESTAMP DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')),
     -- n, New | pe, Pending | pr, In Progress | co, Completed | ca, Cancelled
     status TEXT CHECK( status IN ('n', 'pe', 'pr', 'co', 'ca') ) NOT NULL DEFAULT 'n', 
     special_instructions TEXT,                          
@@ -46,7 +46,7 @@ CREATE TABLE files (
     mid_color_pages TEXT,
     -- 0.01 to 0.33
     spot_color_pages TEXT,
-    file_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    file_timestamp TIMESTAMP DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')),
     FOREIGN KEY (order_id) REFERENCES orders(order_id)
 );
 
@@ -62,7 +62,7 @@ CREATE TABLE page_ranges (
     color TEXT CHECK( color IN ('c', 'b') ) NOT NULL DEFAULT 'b', 
     -- s, Single-sided | d, Double-sided
     duplex TEXT CHECK( duplex IN ('s', 'd') ) NOT NULL DEFAULT 's',
-    page_range_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    page_range_timestamp TIMESTAMP DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')),
     FOREIGN KEY (file_id) REFERENCES files(file_id)
 );
 
