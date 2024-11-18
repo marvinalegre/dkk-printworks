@@ -56,7 +56,7 @@ export default function OrderComponent() {
       <FileUpload orderRefNumber={orderRefNumber} />
 
       <p className="text-xl font-semibold text-gray-800 mt-4 max-w-sm mx-auto">
-        Total price: <span class="text-green-500">${totalPrice}</span>
+        Total price: <span className="text-green-500">${totalPrice}</span>
       </p>
 
       <div className="flex justify-center items-center max-w-sm m-auto my-5">
