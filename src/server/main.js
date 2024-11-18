@@ -59,6 +59,7 @@ app.get("/api/order", async (req, res) => {
     const order = {};
 
     order.orderRefNumber = ranges[0].order_reference_number;
+    order.totalPrice = ranges[0].total_price;
     order.files = [];
 
     if (ranges.length === 1 && ranges[0].file_name === null) return order;
@@ -77,6 +78,7 @@ app.get("/api/order", async (req, res) => {
           file.numPages = range.num_pages;
           range.pageRange = range.page_range;
           range.pageSize = range.paper_size;
+          delete range.total_price;
           delete range.paper_size;
           delete range.page_range;
           delete range.file_name;

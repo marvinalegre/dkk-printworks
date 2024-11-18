@@ -16,7 +16,7 @@ export const loader = async () => {
 };
 
 export default function OrderComponent() {
-  const { files, orderRefNumber } = useLoaderData();
+  const { files, orderRefNumber, totalPrice } = useLoaderData();
   const submit = useSubmit();
 
   function debounce(func, delay) {
@@ -55,6 +55,10 @@ export default function OrderComponent() {
 
       <FileUpload orderRefNumber={orderRefNumber} />
 
+      <p className="text-xl font-semibold text-gray-800 mt-4 max-w-sm mx-auto">
+        Total price: <span class="text-green-500">${totalPrice}</span>
+      </p>
+
       <div className="flex justify-center items-center max-w-sm m-auto my-5">
         <button
           onClick={() => {
@@ -84,7 +88,12 @@ function FileForm({ file }) {
 
   return (
     <div className="rounded-lg my-10">
-      <h3 className="text-2xl font-semibold text-gray-800">{file.name}</h3>
+      <h3 className="text-2xl font-semibold text-gray-800">
+        {file.name}{" "}
+        <span className="text-gray-400 text-sm">
+          ({`${file.numPages} ${file.numPages === 1 ? "page" : "pages"}`})
+        </span>
+      </h3>
 
       <div className="mb-4">
         <label
