@@ -44,18 +44,18 @@ app.get("/api/order", async (req, res) => {
   }
 
   const userId = await getUserId(req.jwtId);
-
   if (!userId) {
     res.status(401).json({ err: "unauthorized" });
     return;
   }
 
   let pageRanges = await getNewOrder(userId);
-
   if (!pageRanges.length) {
     await createNewOrder(userId, `o-${uuidv4()}`);
     pageRanges = await getNewOrder(userId);
   }
+
+  res.json(rangesToOrder(pageRanges));
 
   function rangesToOrder(ranges) {
     const order = {};
@@ -98,8 +98,6 @@ app.get("/api/order", async (req, res) => {
 
     return order;
   }
-
-  res.json(rangesToOrder(pageRanges));
 });
 app.post("/api/upload", async (req, res) => {
   const form = formidable({});
