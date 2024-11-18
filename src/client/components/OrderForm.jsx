@@ -55,8 +55,12 @@ export default function OrderComponent() {
 
       <FileUpload orderRefNumber={orderRefNumber} />
 
-      <p className="text-xl font-semibold text-gray-800 mt-4 max-w-sm mx-auto">
-        Total price: <span className="text-green-500">${totalPrice}</span>
+      <p
+        className={`${
+          files.length ? "" : "hidden"
+        } text-xl font-semibold text-gray-800 mt-4 max-w-sm mx-auto`}
+      >
+        Total price: <span className="text-green-500">Php {totalPrice}.00</span>
       </p>
 
       <div className="flex justify-center items-center max-w-sm m-auto my-5">
