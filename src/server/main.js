@@ -103,30 +103,14 @@ app.post("/api/upload", async (req, res) => {
   const form = formidable({});
   form.uploadDir = `${process.cwd()}/files`;
 
-  const getFileAndOrderRefNum = function (form) {
-    return new Promise((resolve, reject) => {
-      form.parse(req, (err, fields, files) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        resolve({
-          orderRefNumber: fields.orderRefNumber[0],
-          file: files.upload[0],
-        });
-      });
-    });
-  };
-
   const {
     orderRefNumber,
     file: { newFilename, originalFilename, mimetype, size },
   } = await getFileAndOrderRefNum(form);
-
   const numPages = await getPdfPageCount(
     `${process.cwd()}/files/${newFilename}`
   );
+
   await pdfToImage(`${process.cwd()}/files/${newFilename}`, newFilename);
 
   const fullColorPages = [];
@@ -145,21 +129,18 @@ app.post("/api/upload", async (req, res) => {
     }
   }
 
-  const pageCount = await getPdfPageCount(
-    `${process.cwd()}/files/${newFilename}`
-  );
-
   const rowid = await insertFile(
     await getOrderId(orderRefNumber),
     originalFilename,
     newFilename,
     size,
-    pageCount,
+    numPages,
     arrayToRangeString(fullColorPages),
     arrayToRangeString(midColorPages),
     arrayToRangeString(spotColorPages)
   );
 
+  // TODO: accomodate uncommon page sizes
   const [width, length] = await getPdfPageSize(
     `${process.cwd()}/files/${newFilename}`
   );
@@ -174,7 +155,7 @@ app.post("/api/upload", async (req, res) => {
 
   await insertPageRange(
     rowid,
-    pageCount === 1 ? "1" : `1-${pageCount}`,
+    numPages === 1 ? "1" : `1-${numPages}`,
     1,
     paperSizeName ? paperSizeName : "s",
     "b",
@@ -186,7 +167,23 @@ app.post("/api/upload", async (req, res) => {
   );
   await updateTotalPrice(computePrice(pageRanges, 3), orderRefNumber);
 
-  res.send("hit");
+  res.json({ success: true });
+
+  function getFileAndOrderRefNum(form) {
+    return new Promise((resolve, reject) => {
+      form.parse(req, (err, fields, files) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve({
+          orderRefNumber: fields.orderRefNumber[0],
+          file: files.upload[0],
+        });
+      });
+    });
+  }
 });
 app.get("/api/user", async (req, res) => {
   if (req.jwtId) {
