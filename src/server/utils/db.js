@@ -22,7 +22,7 @@ export async function getNewOrder(userId) {
   const output = db
     .prepare(
       `
-      select order_reference_number, file_name, total_price, num_pages, page_range, copies, color, paper_size from orders
+      select order_reference_number, file_name, total_price, num_pages, page_range, copies, color, paper_size, full_color_pages, mid_color_pages, spot_color_pages from orders
       left join files on orders.order_id = files.order_id
       left join page_ranges on files.file_id = page_ranges.file_id
       where orders.status = 'n'
@@ -45,6 +45,19 @@ export async function getUserId(jwtId) {
   const row = db
     .prepare("select user_id from users where jwt_id = ?")
     .get(jwtId);
+
+  db.close();
+
+  return row?.user_id;
+}
+
+export async function getUserIdFromOrderRefNum(orderRefNumber) {
+  const db = new Database(`${process.cwd()}/db.sql`);
+  db.pragma("journal_mode = WAL");
+
+  const row = db
+    .prepare("select user_id from orders where order_reference_number = ?")
+    .get(orderRefNumber);
 
   db.close();
 
@@ -162,6 +175,21 @@ export async function insertPageRange(
     .run(fileId, pageRange, copies, paperSize, color, duplex);
 
   if (info.changes !== 1) throw "file was not inserted";
+
+  db.close();
+}
+
+export async function updateTotalPrice(newPrice, orderRefNumber) {
+  const db = new Database(`${process.cwd()}/db.sql`);
+  db.pragma("journal_mode = WAL");
+
+  const info = db
+    .prepare(
+      "update orders set total_price = ? where order_reference_number = ?"
+    )
+    .run(newPrice, orderRefNumber);
+
+  if (info.changes !== 1) throw "total price was not updated";
 
   db.close();
 }

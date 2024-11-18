@@ -13,11 +13,13 @@ import {
   getHashAndJwtId,
   getNewOrder,
   getUserId,
+  getUserIdFromOrderRefNum,
   getUsername,
   insertUser,
   insertFile,
   getOrderId,
   insertPageRange,
+  updateTotalPrice,
 } from "./utils/db.js";
 import {
   pdfToImage,
@@ -78,6 +80,9 @@ app.get("/api/order", async (req, res) => {
           file.numPages = range.num_pages;
           range.pageRange = range.page_range;
           range.pageSize = range.paper_size;
+          delete range.full_color_pages;
+          delete range.mid_color_pages;
+          delete range.spot_color_pages;
           delete range.total_price;
           delete range.paper_size;
           delete range.page_range;
@@ -177,6 +182,11 @@ app.post("/api/upload", async (req, res) => {
     "b",
     "s"
   );
+
+  const pageRanges = await getNewOrder(
+    await getUserIdFromOrderRefNum(orderRefNumber)
+  );
+  await updateTotalPrice(computePrice(pageRanges, 3), orderRefNumber);
 
   res.send("hit");
 });
@@ -351,4 +361,16 @@ function arrayToRangeString(arr) {
   }
 
   return result.join(",");
+}
+
+// all pages have same price
+function computePrice(pageRanges, pricePerPage) {
+  let price = 0;
+  for (let range of pageRanges) {
+    const numCopies = range.copies;
+    const pages = parseRangeString(range.page_range);
+    price += pages.length * numCopies * pricePerPage;
+  }
+
+  return price;
 }
