@@ -15,8 +15,10 @@ import SignUpPage, {
   loader as signUpPageLoader,
 } from "./routes/SignUpPage";
 import Index from "./routes/Index";
-import OrderForm, { loader as orderFormLoader } from "./components/OrderForm";
-import { action as uploadFile } from "./components/FileUpload";
+import OrderForm, {
+  action as orderFormAction,
+  loader as orderFormLoader,
+} from "./components/OrderForm";
 
 const router = createBrowserRouter(
   [
@@ -27,7 +29,12 @@ const router = createBrowserRouter(
       children: [
         { index: true, element: <Index /> },
         { path: "/logout", element: <LogoutPage />, loader: logoutPageLoader },
-        { path: "/order", element: <OrderForm />, loader: orderFormLoader },
+        {
+          path: "/order",
+          element: <OrderForm />,
+          action: orderFormAction,
+          loader: orderFormLoader,
+        },
       ],
     },
     {
@@ -41,10 +48,6 @@ const router = createBrowserRouter(
       element: <SignUpPage />,
       action: signUpPageAction,
       loader: signUpPageLoader,
-    },
-    {
-      path: "/upload",
-      action: uploadFile,
     },
   ],
   {

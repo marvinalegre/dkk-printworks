@@ -1,18 +1,12 @@
 import { useState } from "react";
-import { Form, redirect } from "react-router-dom";
+import { Form } from "react-router-dom";
 
-export const action = async ({ request }) => {
-  const formData = await request.formData();
+function FileUpload({ orderRefNumber, actionData, files }) {
+  let filenames = "";
+  for (let file of files) {
+    filenames += `${file.name},`;
+  }
 
-  const res = await fetch("/api/upload", {
-    method: "POST",
-    body: formData,
-  });
-
-  return redirect("/order");
-};
-
-function FileUpload({ orderRefNumber }) {
   // State to hold the selected file name
   const [fileName, setFileName] = useState("");
 
@@ -28,6 +22,12 @@ function FileUpload({ orderRefNumber }) {
 
   return (
     <div className="max-w-lg py-4 rounded m-auto mt-10 mb-10 md:mt-[6vh] bg-gray-100 shadow">
+      {actionData?.fileUploadErrMess ? (
+        <div className="mb-5 text-center text-red-500 text-lg">
+          {actionData.fileUploadErrMess}
+        </div>
+      ) : null}
+
       {/* Display selected file name */}
       <div id="file-name" className="mb-5 text-center text-gray-500 text-lg">
         {fileName ? (
@@ -43,7 +43,6 @@ function FileUpload({ orderRefNumber }) {
       {/* File upload button */}
       <Form
         method="POST"
-        action="/upload"
         encType="multipart/form-data"
         className="mt-2 flex md:gap-20 gap-2 justify-center items-center flex-wrap"
       >
@@ -52,6 +51,8 @@ function FileUpload({ orderRefNumber }) {
           defaultValue={orderRefNumber}
           className="hidden"
         ></input>
+        <input name="filenames" defaultValue={filenames} className="hidden" />
+
         <label className="rounded bg-sky-700 px-5 py-1 text-lg font-medium text-white hover:bg-sky-600 text-center">
           {fileName ? "select another file" : "select a file"}
           <input

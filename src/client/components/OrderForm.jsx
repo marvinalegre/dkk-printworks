@@ -1,6 +1,37 @@
-import { Form, redirect, useLoaderData, useSubmit } from "react-router-dom";
+import {
+  Form,
+  redirect,
+  redirectDocument,
+  useActionData,
+  useLoaderData,
+  useSubmit,
+} from "react-router-dom";
 import FileUpload from "./FileUpload";
 import { useState } from "react";
+
+export const action = async ({ request }) => {
+  const formData = await request.formData();
+  if (
+    formData.get("filenames") &&
+    formData.get("filenames").indexOf(formData.get("upload").name) !== -1
+  ) {
+    return { fileUploadErrMess: "the selected file has already been uploaded" };
+  } else {
+    try {
+      // parsed as json to trigger an exception
+      await (
+        await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        })
+      ).json();
+    } catch (e) {
+      return { fileUploadErrMess: "something went wrong" };
+    }
+  }
+
+  return redirectDocument("/order");
+};
 
 export const loader = async () => {
   const [{ loggedIn }, order] = await Promise.all([
@@ -16,6 +47,7 @@ export const loader = async () => {
 };
 
 export default function OrderComponent() {
+  const actionData = useActionData();
   const { files, orderRefNumber, totalPrice } = useLoaderData();
   const submit = useSubmit();
 
@@ -53,7 +85,11 @@ export default function OrderComponent() {
         ))}
       </Form>
 
-      <FileUpload orderRefNumber={orderRefNumber} />
+      <FileUpload
+        orderRefNumber={orderRefNumber}
+        actionData={actionData}
+        files={files}
+      />
 
       <p
         className={`${
