@@ -48,7 +48,8 @@ export const loader = async () => {
 
 export default function OrderComponent() {
   const actionData = useActionData();
-  const { files, orderRefNumber, totalPrice } = useLoaderData();
+  const { files, orderRefNumber, totalPrice, fileUploadErrMessage } =
+    useLoaderData();
   const submit = useSubmit();
 
   function debounce(func, delay) {
@@ -89,6 +90,7 @@ export default function OrderComponent() {
         orderRefNumber={orderRefNumber}
         actionData={actionData}
         files={files}
+        errMessage={fileUploadErrMessage}
       />
 
       <p

@@ -10,6 +10,7 @@ import formidable from "formidable";
 import jwtAuthenticator from "./middlewares/jwtAuthenticator.js";
 import {
   createNewOrder,
+  getFuerrMessage,
   getHashAndJwtId,
   getNewOrder,
   getUserId,
@@ -20,6 +21,7 @@ import {
   getOrderId,
   insertPageRange,
   updateTotalPrice,
+  seenFuerrMessage,
 } from "./utils/db.js";
 import {
   pdfToImage,
@@ -55,7 +57,12 @@ app.get("/api/order", async (req, res) => {
     pageRanges = await getNewOrder(userId);
   }
 
-  res.json(rangesToOrder(pageRanges));
+  const order = rangesToOrder(pageRanges);
+  order.fileUploadErrMessage = (await getFuerrMessage(userId))?.[
+    "fuerr_message"
+  ];
+  await seenFuerrMessage(userId);
+  res.json(order);
 
   function rangesToOrder(ranges) {
     const order = {};

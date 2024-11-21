@@ -15,6 +15,21 @@ export async function createNewOrder(userId, orderRefNumber) {
   db.close();
 }
 
+export async function getFuerrMessage(userId) {
+  const db = new Database(`${process.cwd()}/db.sql`);
+  db.pragma("journal_mode = WAL");
+
+  const output = db
+    .prepare(
+      "select fuerr_message from file_upload_error_messages where user_id = ? and seen = 'n'"
+    )
+    .get(userId);
+
+  db.close();
+
+  return output;
+}
+
 export async function getNewOrder(userId) {
   const db = new Database(`${process.cwd()}/db.sql`);
   db.pragma("journal_mode = WAL");
@@ -177,6 +192,21 @@ export async function insertPageRange(
   if (info.changes !== 1) throw "file was not inserted";
 
   db.close();
+}
+
+export async function seenFuerrMessage(userId) {
+  const db = new Database(`${process.cwd()}/db.sql`);
+  db.pragma("journal_mode = WAL");
+
+  const output = db
+    .prepare(
+      "update file_upload_error_messages set seen = 'y' where user_id = ?"
+    )
+    .run(userId);
+
+  db.close();
+
+  return output;
 }
 
 export async function updateTotalPrice(newPrice, orderRefNumber) {

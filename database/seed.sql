@@ -66,6 +66,14 @@ CREATE TABLE page_ranges (
     FOREIGN KEY (file_id) REFERENCES files(file_id)
 );
 
+DROP TABLE IF EXISTS file_upload_error_messages;
+CREATE TABLE file_upload_error_messages (
+    fuerr_message_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL UNIQUE,
+    fuerr_message TEXT NOT NULL,
+    seen TEXT CHECK( seen IN ('y', 'n') ) NOT NULL DEFAULT 'n'
+);
+
 
 INSERT INTO roles (role_id, role_name) VALUES 
 (1, 'Registered User'),
@@ -88,3 +96,6 @@ INSERT INTO files (order_id, file_name, internal_file_name, file_size, num_pages
 
 INSERT INTO page_ranges (file_id, page_range, copies, paper_size, color, duplex, page_range_timestamp) VALUES 
 (1, '1', 2, 's', 'b', 's', '2024-11-15 08:58:00');
+
+INSERT INTO file_upload_error_messages (user_id, fuerr_message) VALUES
+(1, 'please upload a pdf document');

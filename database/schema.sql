@@ -65,3 +65,11 @@ CREATE TABLE page_ranges (
     page_range_timestamp TIMESTAMP DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')),
     FOREIGN KEY (file_id) REFERENCES files(file_id)
 );
+
+DROP TABLE IF EXISTS file_upload_error_messages;
+CREATE TABLE file_upload_error_messages (
+    fuerr_message_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL UNIQUE,
+    fuerr_message TEXT NOT NULL,
+    seen TEXT CHECK( seen IN ('y', 'n') ) NOT NULL DEFAULT 'n'
+);
