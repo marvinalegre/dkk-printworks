@@ -1,4 +1,7 @@
 {
   "name": "dkk-printworks",
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm run -r --parallel --aggregate-output dev"
+  }
 }

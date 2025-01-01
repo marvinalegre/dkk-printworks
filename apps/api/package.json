@@ -2,7 +2,7 @@
   "name": "@dkk-printworks/api",
   "type": "module",
   "scripts": {
-    "dev:server": "nodemon src/server/main.js -w src/server",
+    "dev": "nodemon src/main.js -w src",
     "start": "NODE_ENV=production node src/server/main.js"
   },
   "dependencies": {
