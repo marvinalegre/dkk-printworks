@@ -1,39 +1,4 @@
 {
-  "name": "dkkprintworks",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "build": "vite build",
-    "dev:client": "vite",
-    "dev:server": "nodemon src/server/main.js -w src/server",
-    "preview": "vite preview",
-    "start": "NODE_ENV=production node src/server/main.js"
-  },
-  "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "better-sqlite3": "^11.5.0",
-    "cookie-parser": "^1.4.7",
-    "dotenv": "^16.4.5",
-    "express": "^5.0.1",
-    "formidable": "^3.5.2",
-    "jsonwebtoken": "^9.0.2",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.28.0",
-    "sharp": "^0.33.5",
-    "uuid": "^11.0.2",
-    "zxcvbn": "^4.4.2"
-  },
-  "devDependencies": {
-    "@types/react": "^18.0.26",
-    "@types/react-dom": "^18.0.10",
-    "@vitejs/plugin-react": "^4.2.0",
-    "autoprefixer": "^10.4.20",
-    "nodemon": "^3.0.1",
-    "postcss": "^8.4.47",
-    "prettier": "^3.4.2",
-    "tailwindcss": "^3.4.14",
-    "vite": "^5.0.2"
-  }
+  "name": "dkk-printworks",
+  "type": "module"
 }
