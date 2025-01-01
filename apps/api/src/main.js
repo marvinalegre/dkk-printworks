@@ -1,5 +1,5 @@
 import "dotenv/config";
-import reservedUsernames from "../utils/reserved-usernames.json" assert { type: "json" };
+import { reservedUsernames } from "@dkk-printworks/reserved-usernames";
 import express from "express";
 import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
@@ -115,7 +115,7 @@ app.post("/api/upload", async (req, res) => {
     file: { newFilename, originalFilename, mimetype, size },
   } = await getFileAndOrderRefNum(form);
   const numPages = await getPdfPageCount(
-    `${process.cwd()}/files/${newFilename}`
+    `${process.cwd()}/files/${newFilename}`,
   );
 
   await pdfToImage(`${process.cwd()}/files/${newFilename}`, newFilename);
@@ -125,7 +125,7 @@ app.post("/api/upload", async (req, res) => {
   const spotColorPages = [];
   for (let i = 1; i <= numPages; i++) {
     const percentage = await getBWPercentage(
-      `${process.cwd()}/files/${newFilename}-${i}.jpg`
+      `${process.cwd()}/files/${newFilename}-${i}.jpg`,
     );
     if (percentage < 0.33) {
       fullColorPages.push(i);
@@ -144,12 +144,12 @@ app.post("/api/upload", async (req, res) => {
     numPages,
     arrayToRangeString(fullColorPages),
     arrayToRangeString(midColorPages),
-    arrayToRangeString(spotColorPages)
+    arrayToRangeString(spotColorPages),
   );
 
   // TODO: accomodate uncommon page sizes
   const [width, length] = await getPdfPageSize(
-    `${process.cwd()}/files/${newFilename}`
+    `${process.cwd()}/files/${newFilename}`,
   );
   let paperSizeName;
   if (594 < width && width < 597 && 840 < length && length < 843) {
@@ -166,11 +166,11 @@ app.post("/api/upload", async (req, res) => {
     1,
     paperSizeName ? paperSizeName : "s",
     "b",
-    "s"
+    "s",
   );
 
   const pageRanges = await getNewOrder(
-    await getUserIdFromOrderRefNum(orderRefNumber)
+    await getUserIdFromOrderRefNum(orderRefNumber),
   );
   await updateTotalPrice(computePrice(pageRanges, 3), orderRefNumber);
 

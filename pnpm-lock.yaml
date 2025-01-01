@@ -10,6 +10,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@dkk-printworks/reserved-usernames':
+        specifier: workspace:*
+        version: link:../../packages/reserved-usernames
       bcryptjs:
         specifier: ^2.4.3
         version: 2.4.3
@@ -81,6 +84,8 @@ importers:
       vite:
         specifier: ^5.0.2
         version: 5.4.11
+
+  packages/reserved-usernames: {}
 
 packages:
 
