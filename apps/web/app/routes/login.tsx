@@ -1,7 +1,7 @@
-import { Form, Link, redirect, useActionData } from "react-router-dom";
+import { Form, Link, redirect, useActionData } from "react-router";
 import { validateUsername, validatePassword } from "@dkk-printworks/validation";
 
-export async function action({ request }) {
+export async function clientAction({ request }) {
   const formData = await request.formData();
 
   try {
@@ -35,7 +35,7 @@ export async function action({ request }) {
   return { err };
 }
 
-export async function loader() {
+export async function clientLoader() {
   const res = await fetch("/api/user");
   const { loggedIn } = await res.json();
 

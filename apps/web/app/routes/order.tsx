@@ -1,15 +1,16 @@
 import {
+  Link,
   Form,
+  useLoaderData,
   redirect,
   redirectDocument,
   useActionData,
-  useLoaderData,
   useSubmit,
-} from "react-router-dom";
-import FileUpload from "./FileUpload";
+} from "react-router";
+import FileUpload from "../components/file-upload";
 import { useState } from "react";
 
-export const action = async ({ request }) => {
+export const clientAction = async ({ request }) => {
   const formData = await request.formData();
   if (
     formData.get("filenames") &&
@@ -33,7 +34,7 @@ export const action = async ({ request }) => {
   return redirectDocument("/order");
 };
 
-export const loader = async () => {
+export const clientLoader = async () => {
   const [{ loggedIn }, order] = await Promise.all([
     (await fetch("/api/user")).json(),
     (await fetch("/api/order")).json(),
@@ -46,7 +47,8 @@ export const loader = async () => {
   return order;
 };
 
-export default function OrderComponent() {
+export default function Root() {
+  const { loggedIn, username } = useLoaderData();
   const actionData = useActionData();
   const { files, orderRefNumber, totalPrice, fileUploadErrMessage } =
     useLoaderData();
@@ -67,55 +69,84 @@ export default function OrderComponent() {
   }, 500);
 
   return (
-    <div className="px-2 border">
-      <Form
-        method="post"
-        onChange={debouncedSubmit}
-        className={`${
-          files.length ? "" : "hidden"
-        } max-w-sm mx-auto md:mt-4 rounded-lg`}
-      >
-        <input
-          name="orderRefNumber"
-          className="hidden"
-          defaultValue={orderRefNumber}
-        ></input>
+    <>
+      <nav className="navbar bg-sky-500 h-9 text-white md:rounded-tl md:rounded-tr">
+        <Link to="/">
+          <div className="font-semibold text-3xl italic">DKK</div>
+        </Link>
+        <ul className="flex text-gray-300 space-x-8 ml-10 text-xl">
+          {loggedIn ? null : (
+            <li>
+              <Link to="login" className="py-1 text-black">
+                log in
+              </Link>
+            </li>
+          )}
+          {loggedIn ? (
+            <li>
+              <Link to={username} className="py-1 text-black">
+                {username}
+              </Link>
+              {" | "}
+              <Link to="logout" className="py-1 text-black">
+                log out
+              </Link>
+            </li>
+          ) : null}
+        </ul>
+      </nav>
 
-        {files.map((file, rowIndex) => (
-          <FileForm key={rowIndex} file={file} />
-        ))}
-      </Form>
-
-      <FileUpload
-        orderRefNumber={orderRefNumber}
-        actionData={actionData}
-        files={files}
-        errMessage={fileUploadErrMessage}
-      />
-
-      <p
-        className={`${
-          files.length ? "" : "hidden"
-        } text-xl font-semibold text-gray-800 mt-4 max-w-sm mx-auto`}
-      >
-        Total price: <span className="text-green-500">Php {totalPrice}.00</span>
-      </p>
-
-      <div className="flex justify-center items-center max-w-sm m-auto my-5">
-        <button
-          onClick={() => {
-            submit(document.getElementById("foo"));
-          }}
+      <div className="px-2 border">
+        <Form
+          method="post"
+          onChange={debouncedSubmit}
           className={`${
             files.length ? "" : "hidden"
-          } rounded bg-sky-500 px-4 py-2 text-xl font-medium text-white hover:bg-sky-600 w-full`}
-          value="asdf"
-          name="bin"
+          } max-w-sm mx-auto md:mt-4 rounded-lg`}
         >
-          complete order
-        </button>
+          <input
+            name="orderRefNumber"
+            className="hidden"
+            defaultValue={orderRefNumber}
+          ></input>
+
+          {files.map((file, rowIndex) => (
+            <FileForm key={rowIndex} file={file} />
+          ))}
+        </Form>
+
+        <FileUpload
+          orderRefNumber={orderRefNumber}
+          actionData={actionData}
+          files={files}
+          errMessage={fileUploadErrMessage}
+        />
+
+        <p
+          className={`${
+            files.length ? "" : "hidden"
+          } text-xl font-semibold text-gray-800 mt-4 max-w-sm mx-auto`}
+        >
+          Total price:{" "}
+          <span className="text-green-500">Php {totalPrice}.00</span>
+        </p>
+
+        <div className="flex justify-center items-center max-w-sm m-auto my-5">
+          <button
+            onClick={() => {
+              submit(document.getElementById("foo"));
+            }}
+            className={`${
+              files.length ? "" : "hidden"
+            } rounded bg-sky-500 px-4 py-2 text-xl font-medium text-white hover:bg-sky-600 w-full`}
+            value="asdf"
+            name="bin"
+          >
+            complete order
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

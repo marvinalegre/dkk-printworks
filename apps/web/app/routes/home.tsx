@@ -1,13 +1,13 @@
-import { Link, Outlet, useLoaderData } from "react-router-dom";
+import { Link, useLoaderData } from "react-router";
 
-export const loader = async () => {
+export const clientLoader = async () => {
   const res = await fetch("/api/user");
   const { loggedIn, username } = await res.json();
 
   return { loggedIn, username };
 };
 
-export default function Root() {
+export default function Home() {
   const { loggedIn, username } = useLoaderData();
 
   return (
@@ -38,7 +38,13 @@ export default function Root() {
         </ul>
       </nav>
 
-      <Outlet />
+      <div className="max-w-72 mx-auto">
+        <img
+          src="https://robohash.org/2E0.png?set=set1"
+          className="my-5 mx-auto border"
+        />
+        <Link to="/order">Start order</Link>
+      </div>
     </>
   );
 }
