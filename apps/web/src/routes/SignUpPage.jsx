@@ -1,13 +1,19 @@
 import { Form, Link, redirect, useActionData } from "react-router-dom";
-import { validUsername } from "../../utils/validation";
+import { validateUsername, validatePassword } from "@dkk-printworks/validation";
 
 export async function action({ request }) {
   const formData = await request.formData();
 
-  if (!validUsername(formData.get("username"))) {
-    return {
-      err: "Invalid username",
-    };
+  try {
+    validateUsername(formData.get("username"));
+  } catch (e) {
+    return { err: e.message };
+  }
+
+  try {
+    validatePassword(formData.get("password"));
+  } catch (e) {
+    return { err: e.message };
   }
 
   const res = await fetch("/api/signup", {

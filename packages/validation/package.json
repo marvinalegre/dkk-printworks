@@ -1,0 +1,5 @@
+{
+  "name": "@dkk-printworks/validation",
+  "type": "module",
+  "main": "index.js"
+}

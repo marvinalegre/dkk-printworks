@@ -50,6 +50,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@dkk-printworks/validation':
+        specifier: workspace:*
+        version: link:../../packages/validation
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -86,6 +89,8 @@ importers:
         version: 5.4.11
 
   packages/reserved-usernames: {}
+
+  packages/validation: {}
 
 packages:
 
