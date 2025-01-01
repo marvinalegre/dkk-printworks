@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { reservedUsernames } from "@dkk-printworks/reserved-usernames";
+import { validateUsername, validatePassword } from "@dkk-printworks/validation";
 import express from "express";
 import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
@@ -28,7 +29,6 @@ import {
   getPdfPageCount,
   getPdfPageSize,
 } from "./utils/doc-processing.js";
-import { validUsername } from "../utils/validation.js";
 import { getBWPercentage } from "./utils/image-processing.js";
 
 const app = express();
@@ -202,18 +202,25 @@ app.get("/api/user", async (req, res) => {
 app.post("/api/login", async (req, res) => {
   const { username, password } = req.body;
 
-  if (!validUsername(username) || reservedUsernames.includes(username)) {
+  try {
+    validateUsername(username);
+  } catch (e) {
+    res.json({ success: false, err: e.message });
+    return;
+  }
+
+  if (reservedUsernames.includes(username)) {
     res.json({
       success: false,
-      err: "Invalid username",
+      err: "This username is unavailable.",
     });
     return;
   }
-  if (password.length < 12) {
-    res.json({
-      success: false,
-      err: "Password must be at least 12 characters",
-    });
+
+  try {
+    validatePassword(password);
+  } catch (e) {
+    res.json({ success: false, err: e.message });
     return;
   }
 
@@ -257,11 +264,25 @@ app.get("/api/logout", (req, res) => {
 app.post("/api/signup", async (req, res) => {
   const { username, password } = req.body;
 
-  if (!validUsername(username) || reservedUsernames.includes(username)) {
+  try {
+    validateUsername(username);
+  } catch (e) {
+    res.json({ success: false, err: e.message });
+    return;
+  }
+
+  if (reservedUsernames.includes(username)) {
     res.json({
       success: false,
-      err: "Invalid username",
+      err: "This username is unavailable.",
     });
+    return;
+  }
+
+  try {
+    validatePassword(password);
+  } catch (e) {
+    res.json({ success: false, err: e.message });
     return;
   }
 

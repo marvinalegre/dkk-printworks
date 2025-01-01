@@ -13,6 +13,9 @@ importers:
       '@dkk-printworks/reserved-usernames':
         specifier: workspace:*
         version: link:../../packages/reserved-usernames
+      '@dkk-printworks/validation':
+        specifier: workspace:*
+        version: link:../../packages/validation
       bcryptjs:
         specifier: ^2.4.3
         version: 2.4.3
