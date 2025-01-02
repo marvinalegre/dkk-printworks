@@ -31,8 +31,8 @@ CREATE TABLE orders (
     cancelled_at TIMESTAMP,
     -- n, New | pe, Pending | pr, In Progress | co, Completed | ho, Handed over | ca, Cancelled
     status TEXT CHECK( status IN ('n', 'pe', 'pr', 'co', 'ho', 'ca') ) NOT NULL DEFAULT 'n', 
-    special_instructions TEXT,                          
-    total_price DECIMAL(10, 2) NOT NULL,                 
+    special_instructions TEXT,
+    total_price DECIMAL(10, 2),
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
