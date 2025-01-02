@@ -11,7 +11,7 @@ import formidable from "formidable";
 import jwtAuthenticator from "./middlewares/jwtAuthenticator.js";
 import {
   createNewOrder,
-  getFuerrMessage,
+  getOrderFiles,
   getHashAndJwtId,
   getNewOrder,
   getUserId,
@@ -22,7 +22,6 @@ import {
   getOrderId,
   insertPageRange,
   updateTotalPrice,
-  seenFuerrMessage,
 } from "./utils/db.js";
 import {
   pdfToImage,
@@ -51,60 +50,17 @@ app.get("/api/order", async (req, res) => {
     return;
   }
 
-  let pageRanges = await getNewOrder(userId);
-  if (!pageRanges.length) {
+  let newOrder = await getNewOrder(userId);
+  if (!newOrder) {
     await createNewOrder(userId, `o-${uuidv4()}`);
-    pageRanges = await getNewOrder(userId);
+    newOrder = await getNewOrder(userId);
   }
 
-  const order = rangesToOrder(pageRanges);
-  order.fileUploadErrMessage = (await getFuerrMessage(userId))?.[
-    "fuerr_message"
-  ];
-  await seenFuerrMessage(userId);
-  res.json(order);
-
-  function rangesToOrder(ranges) {
-    const order = {};
-
-    order.orderRefNumber = ranges[0].order_reference_number;
-    order.totalPrice = ranges[0].total_price;
-    order.files = [];
-
-    if (ranges.length === 1 && ranges[0].file_name === null) return order;
-
-    let fileNames = new Set();
-    for (let range of ranges) {
-      fileNames.add(range.file_name);
-    }
-
-    for (let fileName of fileNames) {
-      let file = {};
-      file.name = fileName;
-      file.pageRanges = [];
-      for (let range of ranges) {
-        if (range.file_name === fileName) {
-          file.numPages = range.num_pages;
-          range.pageRange = range.page_range;
-          range.pageSize = range.paper_size;
-          delete range.full_color_pages;
-          delete range.mid_color_pages;
-          delete range.spot_color_pages;
-          delete range.total_price;
-          delete range.paper_size;
-          delete range.page_range;
-          delete range.file_name;
-          delete range.order_reference_number;
-          delete range.num_pages;
-          file.pageRanges.push(range);
-        }
-      }
-
-      order.files.push(file);
-    }
-
-    return order;
-  }
+  const files = await getOrderFiles(newOrder.order_id);
+  res.json({
+    orderRefNum: newOrder.order_reference_number,
+    files,
+  });
 });
 app.post("/api/upload", async (req, res) => {
   const form = formidable({});
