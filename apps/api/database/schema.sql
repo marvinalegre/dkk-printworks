@@ -12,8 +12,8 @@ CREATE TABLE users (
     display_name TEXT,
     email TEXT UNIQUE,
     password_hash TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')),
-    updated_at TIMESTAMP DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     role_id INTEGER,
     FOREIGN KEY (role_id) REFERENCES roles(role_id)
 );
@@ -23,9 +23,14 @@ CREATE TABLE orders (
     order_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     order_reference_number TEXT NOT NULL UNIQUE,
-    order_date TIMESTAMP DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')),
-    -- n, New | pe, Pending | pr, In Progress | co, Completed | ca, Cancelled
-    status TEXT CHECK( status IN ('n', 'pe', 'pr', 'co', 'ca') ) NOT NULL DEFAULT 'n', 
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    pending_at TIMESTAMP,
+    in_progress_at TIMESTAMP,
+    completed_at TIMESTAMP,
+    handed_over_at TIMESTAMP,
+    cancelled_at TIMESTAMP,
+    -- n, New | pe, Pending | pr, In Progress | co, Completed | ho, Handed over | ca, Cancelled
+    status TEXT CHECK( status IN ('n', 'pe', 'pr', 'co', 'ho', 'ca') ) NOT NULL DEFAULT 'n', 
     special_instructions TEXT,                          
     total_price DECIMAL(10, 2) NOT NULL,                 
     FOREIGN KEY (user_id) REFERENCES users(user_id)
@@ -46,7 +51,8 @@ CREATE TABLE files (
     mid_color_pages TEXT,
     -- 0.01 to 0.33
     spot_color_pages TEXT,
-    file_timestamp TIMESTAMP DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')),
+    paper_size TEXT CHECK( paper_size IN ('a', 's', 'l') ) NOT NULL DEFAULT 's',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     FOREIGN KEY (order_id) REFERENCES orders(order_id)
 );
 
@@ -62,14 +68,6 @@ CREATE TABLE page_ranges (
     color TEXT CHECK( color IN ('c', 'b') ) NOT NULL DEFAULT 'b', 
     -- s, Single-sided | d, Double-sided
     duplex TEXT CHECK( duplex IN ('s', 'd') ) NOT NULL DEFAULT 's',
-    page_range_timestamp TIMESTAMP DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     FOREIGN KEY (file_id) REFERENCES files(file_id)
-);
-
-DROP TABLE IF EXISTS file_upload_error_messages;
-CREATE TABLE file_upload_error_messages (
-    fuerr_message_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL UNIQUE,
-    fuerr_message TEXT NOT NULL,
-    seen TEXT CHECK( seen IN ('y', 'n') ) NOT NULL DEFAULT 'n'
 );
