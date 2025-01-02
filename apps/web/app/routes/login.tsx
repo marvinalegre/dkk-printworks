@@ -74,8 +74,6 @@ export default function Login() {
           <input
             autoComplete="off"
             name="username"
-            minLength={3}
-            maxLength={20}
             required
             placeholder="Username"
             className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
@@ -84,7 +82,6 @@ export default function Login() {
             id="password"
             name="password"
             type="password"
-            minLength={12}
             required
             placeholder="Password"
             className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
