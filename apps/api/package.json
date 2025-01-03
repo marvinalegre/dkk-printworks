@@ -2,6 +2,7 @@
   "name": "@dkk-printworks/api",
   "type": "module",
   "scripts": {
+    "create-db": "rm db.sql*; touch db.sql; sqlite3 db.sql < database/schema.sql;",
     "dev": "nodemon src/main.js -w src",
     "start": "NODE_ENV=production node src/server/main.js"
   },
