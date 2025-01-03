@@ -146,14 +146,14 @@ export async function insertFile(
   fullColorPages,
   midColorPages,
   spotColorPages,
-  pageSize
+  paperSize
 ) {
   const db = new Database(`${process.cwd()}/db.sql`);
   db.pragma("journal_mode = WAL");
 
   const info = db
     .prepare(
-      "insert into files (order_id, file_name, internal_file_name, file_size, num_pages, full_color_pages, mid_color_pages, spot_color_pages, page_size) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+      "insert into files (order_id, file_name, internal_file_name, file_size, num_pages, full_color_pages, mid_color_pages, spot_color_pages, paper_size) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"
     )
     .run(
       orderId,
@@ -164,7 +164,7 @@ export async function insertFile(
       fullColorPages,
       midColorPages,
       spotColorPages,
-      pageSize
+      paperSize
     );
 
   db.close();
