@@ -56,19 +56,6 @@ export default function Root() {
   const submit = useSubmit();
 
   const [totalPrice, setTotalPrice] = useState(0);
-  function debounce(func, delay) {
-    let timer;
-    return function (...args) {
-      clearTimeout(timer); // Clear the previous timeout
-      timer = setTimeout(() => {
-        func(...args); // Execute the callback after the delay
-      }, delay);
-    };
-  }
-  const debouncedSubmit = debounce((e) => {
-    console.log(e.target.parentElement);
-    submit(e.target.parentElement);
-  }, 500);
 
   return (
     <>
@@ -92,7 +79,6 @@ export default function Root() {
       <div className="px-2 border">
         <Form
           method="post"
-          onChange={debouncedSubmit}
           className={`${
             files.length ? "" : "hidden"
           } max-w-sm mx-auto md:mt-4 rounded-lg`}
@@ -126,14 +112,9 @@ export default function Root() {
 
         <div className="flex justify-center items-center max-w-sm m-auto my-5">
           <button
-            onClick={() => {
-              submit(document.getElementById("foo"));
-            }}
             className={`${
               files.length ? "" : "hidden"
             } rounded bg-sky-500 px-4 py-2 text-xl font-medium text-white hover:bg-sky-600 w-full`}
-            value="asdf"
-            name="bin"
           >
             complete order
           </button>
