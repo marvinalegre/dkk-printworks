@@ -78,11 +78,11 @@ export default function Root() {
         </Link>
         <ul className="flex text-gray-300 space-x-8 ml-10 text-xl">
           <li>
-            <Link to={username} className="py-1 text-black">
+            <Link to={`/${username}`} className="py-1 text-black">
               {username}
             </Link>
             {" | "}
-            <Link to="logout" className="py-1 text-black">
+            <Link to="/logout" className="py-1 text-black">
               log out
             </Link>
           </li>
