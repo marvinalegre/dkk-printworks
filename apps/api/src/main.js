@@ -58,7 +58,7 @@ app.get("/api/order", async (req, res) => {
 
   const files = await getOrderFiles(newOrder.order_id);
   res.json({
-    orderRefNum: newOrder.order_reference_number,
+    orderRefNumber: newOrder.order_reference_number,
     files,
   });
 });
