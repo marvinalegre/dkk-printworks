@@ -35,7 +35,7 @@ export const clientAction = async ({ request }) => {
 };
 
 export const clientLoader = async () => {
-  const [{ loggedIn }, order] = await Promise.all([
+  const [{ loggedIn, username }, order] = await Promise.all([
     (await fetch("/api/user")).json(),
     (await fetch("/api/order")).json(),
   ]);
@@ -44,14 +44,15 @@ export const clientLoader = async () => {
     return redirect("/login");
   }
 
-  return order;
+  return { username, order };
 };
 
 export default function Root() {
-  const { loggedIn, username } = useLoaderData();
+  const {
+    username,
+    order: { files, orderRefNumber, fileUploadErrMessage, totalPrice },
+  } = useLoaderData();
   const actionData = useActionData();
-  const { files, orderRefNumber, totalPrice, fileUploadErrMessage } =
-    useLoaderData();
   const submit = useSubmit();
 
   function debounce(func, delay) {
@@ -75,24 +76,15 @@ export default function Root() {
           <div className="font-semibold text-3xl italic">DKK</div>
         </Link>
         <ul className="flex text-gray-300 space-x-8 ml-10 text-xl">
-          {loggedIn ? null : (
-            <li>
-              <Link to="login" className="py-1 text-black">
-                log in
-              </Link>
-            </li>
-          )}
-          {loggedIn ? (
-            <li>
-              <Link to={username} className="py-1 text-black">
-                {username}
-              </Link>
-              {" | "}
-              <Link to="logout" className="py-1 text-black">
-                log out
-              </Link>
-            </li>
-          ) : null}
+          <li>
+            <Link to={username} className="py-1 text-black">
+              {username}
+            </Link>
+            {" | "}
+            <Link to="logout" className="py-1 text-black">
+              log out
+            </Link>
+          </li>
         </ul>
       </nav>
 
