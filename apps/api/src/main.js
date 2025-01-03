@@ -5,8 +5,11 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import { v4 as uuidv4 } from "uuid";
 import formidable from "formidable";
+import { customAlphabet } from "nanoid";
+const nanoid = customAlphabet(
+  "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+);
 
 import jwtAuthenticator from "./middlewares/jwtAuthenticator.js";
 import {
@@ -52,7 +55,7 @@ app.get("/api/order", async (req, res) => {
 
   let newOrder = await getNewOrder(userId);
   if (!newOrder) {
-    await createNewOrder(userId, `o-${uuidv4()}`);
+    await createNewOrder(userId, nanoid());
     newOrder = await getNewOrder(userId);
   }
 
@@ -251,7 +254,7 @@ app.post("/api/signup", async (req, res) => {
 
   // TODO: check in profiler if this is a hotspot
   const passwordHash = bcrypt.hashSync(password, 8);
-  const jwtId = `u-${uuidv4()}`;
+  const jwtId = nanoid();
 
   try {
     await insertUser(username, passwordHash, jwtId);

@@ -16,8 +16,8 @@
     "express": "^5.0.1",
     "formidable": "^3.5.2",
     "jsonwebtoken": "^9.0.2",
+    "nanoid": "^5.0.9",
     "sharp": "^0.33.5",
-    "uuid": "^11.0.2",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
