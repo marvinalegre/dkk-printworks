@@ -50,11 +50,12 @@ export const clientLoader = async () => {
 export default function Root() {
   const {
     username,
-    order: { files, orderRefNumber, fileUploadErrMessage, totalPrice },
+    order: { files, orderRefNumber, fileUploadErrMessage },
   } = useLoaderData();
   const actionData = useActionData();
   const submit = useSubmit();
 
+  const [totalPrice, setTotalPrice] = useState(0);
   function debounce(func, delay) {
     let timer;
     return function (...args) {
@@ -120,7 +121,7 @@ export default function Root() {
           } text-xl font-semibold text-gray-800 mt-4 max-w-sm mx-auto`}
         >
           Total price:{" "}
-          <span className="text-green-500">Php {totalPrice}.00</span>
+          <span className="text-green-500">Php {totalPrice.toFixed(2)}</span>
         </p>
 
         <div className="flex justify-center items-center max-w-sm m-auto my-5">
@@ -143,10 +144,16 @@ export default function Root() {
 }
 
 function FileForm({ file }) {
-  const [pageRanges, setPageRanges] = useState(file.pageRanges);
+  const [pageRanges, setPageRanges] = useState([
+    {
+      paperSize: file.paper_size,
+      color: "bw",
+      range: `1-${file.num_pages}`,
+      copies: 1,
+    },
+  ]);
   const [pages, setPages] = useState(
-    file.pageRanges.length === 1 &&
-      file.pageRanges[0].pageRange === `1-${file.numPages}`
+    pageRanges.length === 1 && pageRanges[0].range === `1-${file.num_pages}`
       ? "all"
       : "custom"
   );
@@ -154,9 +161,9 @@ function FileForm({ file }) {
   return (
     <div className="rounded-lg my-10">
       <h3 className="text-2xl font-semibold text-gray-800">
-        {file.name}{" "}
+        {file.file_name}{" "}
         <span className="text-gray-400 text-sm">
-          ({`${file.numPages} ${file.numPages === 1 ? "page" : "pages"}`})
+          ({`${file.num_pages} ${file.num_pages === 1 ? "page" : "pages"}`})
         </span>
       </h3>
 
@@ -196,7 +203,7 @@ function FileForm({ file }) {
                   className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   id="copies"
                   name="copies"
-                  defaultValue={pageRange.pageRange}
+                  defaultValue={pageRange.range}
                 />
               </div>
 
@@ -228,7 +235,7 @@ function FileForm({ file }) {
                 <select
                   id="color"
                   name="color"
-                  defaultValue={file.color}
+                  defaultValue={pageRange.color}
                   className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                 >
                   <option value="bw">black and white</option>
@@ -245,14 +252,14 @@ function FileForm({ file }) {
                 </label>
 
                 <select
-                  id="page-size"
-                  name="pageSize"
-                  defaultValue={file.pageSize}
+                  id="paper-size"
+                  name="paperSize"
+                  defaultValue={pageRange.paperSize}
                   className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                 >
                   <option value="s">short</option>
                   <option value="l">long</option>
-                  <option value="a4">A4</option>
+                  <option value="a">A4</option>
                 </select>
               </div>
             </div>
@@ -288,7 +295,7 @@ function FileForm({ file }) {
             <select
               id="color"
               name="color"
-              defaultValue={file.color}
+              defaultValue={pageRanges[0].color}
               className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
             >
               <option value="bw">black and white</option>
@@ -307,12 +314,12 @@ function FileForm({ file }) {
             <select
               id="page-size"
               name="pageSize"
-              defaultValue={file.pageSize}
+              defaultValue={pageRanges[0].paperSize}
               className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
             >
               <option value="s">short</option>
               <option value="l">long</option>
-              <option value="a4">A4</option>
+              <option value="a">A4</option>
             </select>
           </div>
         </div>
