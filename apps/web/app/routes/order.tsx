@@ -3,7 +3,6 @@ import {
   Form,
   useLoaderData,
   redirect,
-  redirectDocument,
   useActionData,
   useSubmit,
 } from "react-router";
@@ -31,7 +30,7 @@ export const clientAction = async ({ request }) => {
     }
   }
 
-  return redirectDocument("/order");
+  return null;
 };
 
 export const clientLoader = async () => {
