@@ -49,7 +49,7 @@ export const clientLoader = async () => {
 export default function Root() {
   const {
     username,
-    order: { files, orderRefNumber, fileUploadErrMessage },
+    order: { files, orderRefNumber },
   } = useLoaderData();
   const actionData = useActionData();
   const submit = useSubmit();
@@ -97,7 +97,6 @@ export default function Root() {
           orderRefNumber={orderRefNumber}
           actionData={actionData}
           files={files}
-          errMessage={fileUploadErrMessage}
         />
 
         <p

@@ -1,15 +1,14 @@
 import { useState } from "react";
 import { Form } from "react-router";
 
-function FileUpload({ orderRefNumber, actionData, files, errMessage }) {
+function FileUpload({ orderRefNumber, actionData, files }) {
   let filenames = "";
   for (let file of files) {
-    filenames += `${file.name},`;
+    filenames += `${file.file_name},`;
   }
 
   // State to hold the selected file name
   const [fileName, setFileName] = useState("");
-  const [showLoaderErrMess, setShowLoaderErrMess] = useState(true);
 
   // Handle file selection
   const handleFileChange = (event) => {
@@ -23,11 +22,7 @@ function FileUpload({ orderRefNumber, actionData, files, errMessage }) {
 
   return (
     <div className="max-w-lg py-4 rounded m-auto mt-10 mb-10 md:mt-[6vh] bg-gray-100 shadow">
-      {showLoaderErrMess ? (
-        <div className="mb-5 text-center text-red-500 text-lg">
-          {errMessage}
-        </div>
-      ) : actionData?.fileUploadErrMess ? (
+      {actionData?.fileUploadErrMess ? (
         <div className="mb-5 text-center text-red-500 text-lg">
           {actionData.fileUploadErrMess}
         </div>
