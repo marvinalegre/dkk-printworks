@@ -1,11 +1,4 @@
-import {
-  Link,
-  Form,
-  useLoaderData,
-  redirect,
-  useActionData,
-  useSubmit,
-} from "react-router";
+import { Link, useLoaderData, redirect, useActionData } from "react-router";
 import FileUpload from "../components/file-upload";
 import { useState } from "react";
 
@@ -47,51 +40,28 @@ export const clientLoader = async () => {
 };
 
 export default function Root() {
+  const actionData = useActionData();
   const {
     username,
     order: { files, orderRefNumber },
   } = useLoaderData();
-  const actionData = useActionData();
-  const submit = useSubmit();
 
   const [totalPrice, setTotalPrice] = useState(0);
 
   return (
     <>
-      <nav className="navbar bg-sky-500 h-9 text-white md:rounded-tl md:rounded-tr">
-        <Link to="/">
-          <div className="font-semibold text-3xl italic">DKK</div>
-        </Link>
-        <ul className="flex text-gray-300 space-x-8 ml-10 text-xl">
-          <li>
-            <Link to={`/${username}`} className="py-1 text-black">
-              {username}
-            </Link>
-            {" | "}
-            <Link to="/logout" className="py-1 text-black">
-              log out
-            </Link>
-          </li>
-        </ul>
-      </nav>
+      <NavBar username={username} />
 
       <div className="px-2 border">
-        <Form
-          method="post"
+        <div
           className={`${
             files.length ? "" : "hidden"
           } max-w-sm mx-auto md:mt-4 rounded-lg`}
         >
-          <input
-            name="orderRefNumber"
-            className="hidden"
-            defaultValue={orderRefNumber}
-          ></input>
-
           {files.map((file, rowIndex) => (
             <FileForm key={rowIndex} file={file} />
           ))}
-        </Form>
+        </div>
 
         <FileUpload
           orderRefNumber={orderRefNumber}
@@ -154,7 +124,6 @@ function FileForm({ file }) {
           Pages:
         </label>
         <select
-          id="pages"
           defaultValue={pages}
           onChange={() => {
             setPages((s) => (s === "all" ? "custom" : "all"));
@@ -180,8 +149,7 @@ function FileForm({ file }) {
                 <input
                   autoComplete="off"
                   className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  id="copies"
-                  name="copies"
+                  name="range"
                   defaultValue={pageRange.range}
                 />
               </div>
@@ -197,7 +165,6 @@ function FileForm({ file }) {
                   type="number"
                   autoComplete="off"
                   className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  id="copies"
                   name="copies"
                   defaultValue={pageRange.copies}
                 />
@@ -212,7 +179,6 @@ function FileForm({ file }) {
                 </label>
 
                 <select
-                  id="color"
                   name="color"
                   defaultValue={pageRange.color}
                   className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
@@ -231,7 +197,6 @@ function FileForm({ file }) {
                 </label>
 
                 <select
-                  id="paper-size"
                   name="paperSize"
                   defaultValue={pageRange.paperSize}
                   className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
@@ -257,7 +222,6 @@ function FileForm({ file }) {
               type="number"
               autoComplete="off"
               className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              id="copies"
               name="copies"
               defaultValue={pageRanges[0].copies}
             />
@@ -272,7 +236,6 @@ function FileForm({ file }) {
             </label>
 
             <select
-              id="color"
               name="color"
               defaultValue={pageRanges[0].color}
               className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
@@ -291,7 +254,6 @@ function FileForm({ file }) {
             </label>
 
             <select
-              id="page-size"
               name="pageSize"
               defaultValue={pageRanges[0].paperSize}
               className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
@@ -313,5 +275,26 @@ function FileForm({ file }) {
         </button>
       ) : null}
     </div>
+  );
+}
+
+function NavBar({ username }) {
+  return (
+    <nav className="navbar bg-sky-500 h-9 text-white md:rounded-tl md:rounded-tr">
+      <Link to="/">
+        <div className="font-semibold text-3xl italic">DKK</div>
+      </Link>
+      <ul className="flex text-gray-300 space-x-8 ml-10 text-xl">
+        <li>
+          <Link to={`/${username}`} className="py-1 text-black">
+            {username}
+          </Link>
+          {" | "}
+          <Link to="/logout" className="py-1 text-black">
+            log out
+          </Link>
+        </li>
+      </ul>
+    </nav>
   );
 }
