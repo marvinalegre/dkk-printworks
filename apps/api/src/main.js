@@ -10,6 +10,7 @@ import { customAlphabet } from "nanoid";
 const nanoid = customAlphabet(
   "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 );
+import { exec } from "child_process";
 
 import jwtAuthenticator from "./middlewares/jwtAuthenticator.js";
 import {
@@ -84,7 +85,9 @@ app.post("/api/upload", async (req, res) => {
   const spotColorPages = [];
   for (let i = 1; i <= numPages; i++) {
     const percentage = await getBWPercentage(
-      `${process.cwd()}/files/${newFilename}-${i}.jpg`
+      `${process.cwd()}/files/${newFilename}-${
+        numPages < 10 ? i : i.toString().padStart(2, "0")
+      }.jpg`
     );
     if (percentage < 0.33) {
       fullColorPages.push(i);
@@ -95,7 +98,8 @@ app.post("/api/upload", async (req, res) => {
     }
   }
 
-  // TODO: accomodate uncommon page sizes
+  exec(`rm ${process.cwd()}/files/${newFilename}-*`);
+
   const [width, length] = await getPdfPageSize(
     `${process.cwd()}/files/${newFilename}`
   );
@@ -105,6 +109,8 @@ app.post("/api/upload", async (req, res) => {
   } else if (611 < width && width < 614 && 934 < length && length < 937) {
     paperSizeName = "l";
   } else if (611 < width && width < 614 && 791 < length && length < 793) {
+    paperSizeName = "s";
+  } else {
     paperSizeName = "s";
   }
 
