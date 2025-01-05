@@ -51,7 +51,7 @@ function FileUpload({ orderRefNumber, actionData, files }) {
           defaultValue={orderRefNumber}
           className="hidden"
         ></input>
-        <input name="filenames" defaultValue={filenames} className="hidden" />
+        <input name="filenames" defaultValue={filenames} type="hidden" />
 
         <label className="rounded bg-sky-700 px-5 py-1 text-lg font-medium text-white hover:bg-sky-600 text-center">
           {fileName ? "select another file" : "select a file"}
