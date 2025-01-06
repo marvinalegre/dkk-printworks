@@ -14,16 +14,17 @@ export const clientAction = async ({ request }) => {
     const order = {
       orderRefNumber: formData.get("orderRefNumber"),
       totalPrice: formData.get("totalPrice"),
+      fileRanges: {},
     };
     for (let i = 0; formData.get(`f${i}-range0`) != null; i++) {
-      order[`f${i}`] = [];
+      order.fileRanges[`f${i}`] = [];
       for (let j = 0; formData.get(`f${i}-range${j}`) != null; j++) {
         const range = {};
         range.range = formData.get(`f${i}-range${j}`);
         range.color = formData.get(`f${i}-color${j}`);
         range.copies = formData.get(`f${i}-copies${j}`);
         range.paperSize = formData.get(`f${i}-paperSize${j}`);
-        order[`f${i}`].push(range);
+        order.fileRanges[`f${i}`].push(range);
       }
     }
 

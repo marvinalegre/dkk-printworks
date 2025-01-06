@@ -15,6 +15,25 @@ export async function createNewOrder(userId, orderRefNumber) {
   db.close();
 }
 
+export async function getOrderFilesFromRefNum(refNumber) {
+  const db = new Database(`${process.cwd()}/db.sql`);
+  db.pragma("journal_mode = WAL");
+
+  const output = db
+    .prepare(
+      `
+      select file_id, file_name, num_pages, full_color_pages, mid_color_pages, spot_color_pages, paper_size from orders
+      right join files on orders.order_id = files.order_id
+      where orders.order_reference_number = ?
+      `
+    )
+    .bind(refNumber)
+    .all();
+
+  db.close();
+
+  return output;
+}
 export async function getOrderFiles(orderId) {
   const db = new Database(`${process.cwd()}/db.sql`);
   db.pragma("journal_mode = WAL");
@@ -196,13 +215,14 @@ export async function insertPageRange(
   db.close();
 }
 
-export async function updateTotalPrice(newPrice, orderRefNumber) {
+export async function updateOrder(newPrice, orderRefNumber) {
   const db = new Database(`${process.cwd()}/db.sql`);
   db.pragma("journal_mode = WAL");
 
+  console.log("hit");
   const info = db
     .prepare(
-      "update orders set total_price = ? where order_reference_number = ?"
+      "update orders set total_price = ?, pending_at = CURRENT_TIMESTAMP, status = 'pe' where order_reference_number = ?"
     )
     .run(newPrice, orderRefNumber);
 

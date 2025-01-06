@@ -18,6 +18,7 @@ import {
   getOrderFiles,
   getHashAndJwtId,
   getNewOrder,
+  getOrderFilesFromRefNum,
   getUserId,
   getUserIdFromOrderRefNum,
   getUsername,
@@ -25,7 +26,7 @@ import {
   insertFile,
   getOrderId,
   insertPageRange,
-  updateTotalPrice,
+  updateOrder,
 } from "./utils/db.js";
 import {
   pdfToImage,
@@ -65,6 +66,31 @@ app.get("/api/order", async (req, res) => {
     orderRefNumber: newOrder.order_reference_number,
     files,
   });
+});
+app.post("/api/order", async (req, res) => {
+  const { orderRefNumber, totalPrice, fileRanges } = req.body;
+  const files = await getOrderFilesFromRefNum(orderRefNumber);
+
+  try {
+    for (let i = 0; i < files.length; i++) {
+      for (let r of fileRanges[`f${i}`]) {
+        insertPageRange(
+          files[i].file_id,
+          r.range,
+          Number(r.copies),
+          r.paperSize,
+          r.color === "bw" ? "b" : r.color,
+          "s"
+        );
+      }
+    }
+
+    await updateOrder(Number(totalPrice), orderRefNumber);
+
+    res.json({ success: true });
+  } catch (e) {
+    res.json({ success: false });
+  }
 });
 app.post("/api/upload", async (req, res) => {
   const form = formidable({});
