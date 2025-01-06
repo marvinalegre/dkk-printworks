@@ -57,11 +57,18 @@ export default function Root() {
     if (f.mode === "all") {
       totalPrice += f.ranges[0].copies * f.num_pages;
     } else {
-      f.forEach((r) => {
-        totalPrice += r.copies * countPages(f.range);
+      f.ranges.forEach((r) => {
+        totalPrice += r.copies * countPages(r.range);
       });
     }
   });
+
+  function handleModeChange(filename, value) {
+    const updatedFiles = JSON.parse(JSON.stringify(filesWithRanges));
+    const fileIndex = updatedFiles.findIndex((f) => f.file_name === filename);
+    updatedFiles[fileIndex].mode = value;
+    setFilesWithRanges(updatedFiles);
+  }
 
   return (
     <>
@@ -90,6 +97,9 @@ export default function Root() {
                 </label>
                 <select
                   defaultValue={f.mode}
+                  onChange={(e) =>
+                    handleModeChange(f.file_name, e.target.value)
+                  }
                   className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                 >
                   <option value="all">All</option>
@@ -227,6 +237,14 @@ export default function Root() {
                   </div>
                 </div>
               )}
+              {f.mode === "custom" ? (
+                <button
+                  type="button"
+                  className="rounded bg-sky-700 px-5 py-1 m-auto text-lg font-medium text-white hover:bg-sky-600 text-center"
+                >
+                  add page range
+                </button>
+              ) : null}
             </div>
           ))}
         </div>
