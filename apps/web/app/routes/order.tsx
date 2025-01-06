@@ -51,6 +51,10 @@ export default function Root() {
   );
 
   useEffect(() => setFilesWithRanges(createFilesWithRanges(files)), [files]);
+  useEffect(
+    () => sessionStorage.setItem("files", JSON.stringify(filesWithRanges)),
+    [filesWithRanges]
+  );
 
   let totalPrice = 0;
   filesWithRanges.forEach((f) => {
@@ -67,6 +71,25 @@ export default function Root() {
     const updatedFiles = JSON.parse(JSON.stringify(filesWithRanges));
     const fileIndex = updatedFiles.findIndex((f) => f.file_name === filename);
     updatedFiles[fileIndex].mode = value;
+    setFilesWithRanges(updatedFiles);
+  }
+
+  function handleRangeChange(filename, rangeIndex, field, value) {
+    const updatedFiles = JSON.parse(JSON.stringify(filesWithRanges));
+    const fileIndex = updatedFiles.findIndex((f) => f.file_name === filename);
+    updatedFiles[fileIndex].ranges[rangeIndex][field] = value;
+    setFilesWithRanges(updatedFiles);
+  }
+
+  function addRange(filename) {
+    const updatedFiles = JSON.parse(JSON.stringify(filesWithRanges));
+    const fileIndex = updatedFiles.findIndex((f) => f.file_name === filename);
+    updatedFiles[fileIndex].ranges.push({
+      paperSize: updatedFiles[fileIndex].paper_size,
+      color: "bw",
+      range: `1-${updatedFiles[fileIndex].num_pages}`,
+      copies: 1,
+    });
     setFilesWithRanges(updatedFiles);
   }
 
@@ -122,6 +145,14 @@ export default function Root() {
                           autoComplete="off"
                           className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                           name="range"
+                          onChange={(e) =>
+                            handleRangeChange(
+                              f.file_name,
+                              rowIndex,
+                              "range",
+                              e.target.value
+                            )
+                          }
                           defaultValue={pageRange.range}
                         />
                       </div>
@@ -139,6 +170,14 @@ export default function Root() {
                           className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                           name="copies"
                           defaultValue={pageRange.copies}
+                          onChange={(e) =>
+                            handleRangeChange(
+                              f.file_name,
+                              rowIndex,
+                              "copies",
+                              e.target.value
+                            )
+                          }
                         />
                       </div>
 
@@ -154,6 +193,14 @@ export default function Root() {
                           name="color"
                           defaultValue={pageRange.color}
                           className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                          onChange={(e) =>
+                            handleRangeChange(
+                              f.file_name,
+                              rowIndex,
+                              "color",
+                              e.target.value
+                            )
+                          }
                         >
                           <option value="bw">black and white</option>
                           <option value="c">colored</option>
@@ -172,6 +219,14 @@ export default function Root() {
                           name="paperSize"
                           defaultValue={pageRange.paperSize}
                           className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                          onChange={(e) =>
+                            handleRangeChange(
+                              f.file_name,
+                              rowIndex,
+                              "paperSize",
+                              e.target.value
+                            )
+                          }
                         >
                           <option value="s">short</option>
                           <option value="l">long</option>
@@ -196,6 +251,14 @@ export default function Root() {
                       className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       name="copies"
                       defaultValue={f.ranges[0].copies}
+                      onChange={(e) =>
+                        handleRangeChange(
+                          f.file_name,
+                          0,
+                          "copies",
+                          e.target.value
+                        )
+                      }
                     />
                   </div>
 
@@ -211,6 +274,14 @@ export default function Root() {
                       name="color"
                       defaultValue={f.ranges[0].color}
                       className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                      onChange={(e) =>
+                        handleRangeChange(
+                          f.file_name,
+                          0,
+                          "color",
+                          e.target.value
+                        )
+                      }
                     >
                       <option value="bw">black and white</option>
                       <option value="c">colored</option>
@@ -226,9 +297,17 @@ export default function Root() {
                     </label>
 
                     <select
-                      name="pageSize"
+                      name="paperSize"
                       defaultValue={f.ranges[0].paperSize}
                       className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                      onChange={(e) =>
+                        handleRangeChange(
+                          f.file_name,
+                          0,
+                          "paperSize",
+                          e.target.value
+                        )
+                      }
                     >
                       <option value="s">short</option>
                       <option value="l">long</option>
@@ -241,6 +320,7 @@ export default function Root() {
                 <button
                   type="button"
                   className="rounded bg-sky-700 px-5 py-1 m-auto text-lg font-medium text-white hover:bg-sky-600 text-center"
+                  onClick={(e) => addRange(f.file_name)}
                 >
                   add page range
                 </button>
@@ -390,5 +470,31 @@ function createFilesWithRanges(files) {
       ];
       return f;
     });
+  } else {
+    const filesWithRanges = JSON.parse(sessionStorage.getItem("files"));
+    const frFilenames = filesWithRanges.map((f) => f.file_name);
+    const output = [];
+    for (let f of files) {
+      if (frFilenames.includes(f.file_name)) {
+        for (let fr of filesWithRanges) {
+          if (fr.file_name === f.file_name) {
+            output.push(fr);
+            break;
+          }
+        }
+      } else {
+        f.mode = "all";
+        f.ranges = [
+          {
+            paperSize: f.paper_size,
+            color: "bw",
+            range: `1-${f.num_pages}`,
+            copies: 1,
+          },
+        ];
+        output.push(f);
+      }
+    }
+    return output;
   }
 }
