@@ -15,6 +15,7 @@ import { exec } from "child_process";
 import jwtAuthenticator from "./middlewares/jwtAuthenticator.js";
 import {
   createNewOrder,
+  getOrders,
   getOrderFiles,
   getHashAndJwtId,
   getNewOrder,
@@ -43,6 +44,39 @@ app.use(express.json());
 app.use("/api", cookieParser());
 app.use("/api", jwtAuthenticator());
 
+app.get("/api/orders", async (req, res) => {
+  if (!req.jwtId) {
+    res.status(401).json({ err: "unauthorized" });
+    return;
+  }
+
+  const userId = await getUserId(req.jwtId);
+  if (!userId) {
+    res.status(401).json({ err: "unauthorized" });
+    return;
+  }
+
+  const orders = await getOrders(userId);
+  res.json({
+    orders: orders.map((o) => {
+      const order = {};
+      order.orderRefNumber = o.order_reference_number;
+      order.status = o.status;
+      order.timestamp =
+        o.status === "pe"
+          ? o.pending_at
+          : o.status === "pr"
+          ? o.in_progress_at
+          : o.status === "co"
+          ? o.completed_at
+          : o.status === "ho"
+          ? o.handed_over_at
+          : o.cancelled_at;
+      order.totalPrice = o.total_price;
+      return order;
+    }),
+  });
+});
 app.get("/api/order", async (req, res) => {
   if (!req.jwtId) {
     res.status(401).json({ err: "unauthorized" });

@@ -98,6 +98,22 @@ export async function getUserIdFromOrderRefNum(orderRefNumber) {
   return row?.user_id;
 }
 
+export async function getOrders(userId) {
+  const db = new Database(`${process.cwd()}/db.sql`);
+  db.pragma("journal_mode = WAL");
+
+  const rows = db
+    .prepare(
+      "select order_reference_number, status, created_at, pending_at, in_progress_at, completed_at, handed_over_at, cancelled_at, total_price from orders where user_id = ? and status is not 'n'"
+    )
+    .bind(userId)
+    .all();
+
+  db.close();
+
+  return rows;
+}
+
 export async function getOrderId(orderRefNumber) {
   const db = new Database(`${process.cwd()}/db.sql`);
   db.pragma("journal_mode = WAL");
