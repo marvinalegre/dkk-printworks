@@ -1,10 +1,49 @@
-import { Link, useLoaderData, redirect, useActionData } from "react-router";
+import {
+  Link,
+  useLoaderData,
+  redirect,
+  useActionData,
+  useSubmit,
+} from "react-router";
 import FileUpload from "../components/file-upload";
 import { useState, useEffect } from "react";
 
 export const clientAction = async ({ request }) => {
   const formData = await request.formData();
-  if (
+  if (formData.get("f0-paperSize0") != null) {
+    const order = {
+      orderRefNumber: formData.get("orderRefNumber"),
+      totalPrice: formData.get("totalPrice"),
+    };
+    for (let i = 0; formData.get(`f${i}-range0`) != null; i++) {
+      order[`f${i}`] = [];
+      for (let j = 0; formData.get(`f${i}-range${j}`) != null; j++) {
+        const range = {};
+        range.range = formData.get(`f${i}-range${j}`);
+        range.color = formData.get(`f${i}-color${j}`);
+        range.copies = formData.get(`f${i}-copies${j}`);
+        range.paperSize = formData.get(`f${i}-paperSize${j}`);
+        order[`f${i}`].push(range);
+      }
+    }
+
+    const res = await fetch("/api/order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(order),
+    });
+    const { success } = await res.json();
+
+    if (success) {
+      return redirect(`/${formData.get("username")}`);
+    } else {
+      return {
+        placeOrderErrMessage: "something went wrong while placing order",
+      };
+    }
+  } else if (
     formData.get("filenames") &&
     formData.get("filenames").indexOf(formData.get("upload").name) !== -1
   ) {
@@ -40,6 +79,7 @@ export const clientLoader = async () => {
 };
 
 export default function Root() {
+  const submit = useSubmit();
   const actionData = useActionData();
   const {
     username,
@@ -91,6 +131,27 @@ export default function Root() {
       copies: 1,
     });
     setFilesWithRanges(updatedFiles);
+  }
+
+  function handlePlaceOrder(filesWithRanges, username) {
+    const order = { orderRefNumber, totalPrice, username };
+    for (let i = 0; i < filesWithRanges.length; i++) {
+      if (filesWithRanges[i].mode === "custom") {
+        for (let j = 0; j < filesWithRanges[i].ranges.length; j++) {
+          order[`f${i}-range${j}`] = filesWithRanges[i].ranges[j].range;
+          order[`f${i}-color${j}`] = filesWithRanges[i].ranges[j].color;
+          order[`f${i}-copies${j}`] = filesWithRanges[i].ranges[j].copies;
+          order[`f${i}-paperSize${j}`] = filesWithRanges[i].ranges[j].paperSize;
+        }
+      } else {
+        order[`f${i}-range0`] = `1-${filesWithRanges[i].num_pages}`;
+        order[`f${i}-color0`] = filesWithRanges[i].ranges[0].color;
+        order[`f${i}-copies0`] = filesWithRanges[i].ranges[0].copies;
+        order[`f${i}-paperSize0`] = filesWithRanges[i].ranges[0].paperSize;
+      }
+    }
+
+    submit(order, { method: "post" });
   }
 
   return (
@@ -344,13 +405,19 @@ export default function Root() {
           <span className="text-green-500">Php {totalPrice.toFixed(2)}</span>
         </p>
 
+        {actionData?.placeOrderErrMessage && (
+          <div className="mb-5 text-center text-red-500 text-lg">
+            {actionData.placeOrderErrMessage}
+          </div>
+        )}
         <div className="flex justify-center items-center max-w-sm m-auto my-5">
           <button
             className={`${
               files.length ? "" : "hidden"
             } rounded bg-sky-500 px-4 py-2 text-xl font-medium text-white hover:bg-sky-600 w-full`}
+            onClick={() => handlePlaceOrder(filesWithRanges, username)}
           >
-            complete order
+            place order
           </button>
         </div>
       </div>
