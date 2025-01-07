@@ -7,6 +7,7 @@ import {
 } from "react-router";
 import classNames from "classnames";
 import FileUpload from "../components/file-upload";
+import calculateFilePrice from "../utils/calculate-file-price.ts";
 import { useState, useEffect } from "react";
 
 export const clientAction = async ({ request }) => {
@@ -110,13 +111,7 @@ export default function Root() {
 
   let totalPrice = 0;
   filesWithRanges.forEach((f) => {
-    if (f.mode === "all") {
-      totalPrice += f.ranges[0].copies * f.num_pages;
-    } else {
-      f.ranges.forEach((r) => {
-        totalPrice += r.copies * countPages(r.range);
-      });
-    }
+    totalPrice += calculateFilePrice(f);
   });
 
   function handleModeChange(filename, value) {
