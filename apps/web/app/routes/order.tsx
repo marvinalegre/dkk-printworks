@@ -5,6 +5,7 @@ import {
   useActionData,
   useSubmit,
 } from "react-router";
+import classNames from "classnames";
 import FileUpload from "../components/file-upload";
 import { useState, useEffect } from "react";
 
@@ -97,6 +98,16 @@ export default function Root() {
     [filesWithRanges]
   );
 
+  let validTotalPrice = true;
+  filesWithRanges.forEach((f) => {
+    f.ranges.forEach((r) => {
+      if (validTotalPrice) {
+        validTotalPrice = validTotalPrice && r.validCopies;
+        validTotalPrice = validTotalPrice && r.validRange;
+      }
+    });
+  });
+
   let totalPrice = 0;
   filesWithRanges.forEach((f) => {
     if (f.mode === "all") {
@@ -115,10 +126,28 @@ export default function Root() {
     setFilesWithRanges(updatedFiles);
   }
 
-  function handleRangeChange(filename, rangeIndex, field, value) {
+  function handleRangeChange(filename, rangeIndex, field, value, numPages) {
     const updatedFiles = JSON.parse(JSON.stringify(filesWithRanges));
     const fileIndex = updatedFiles.findIndex((f) => f.file_name === filename);
+
     updatedFiles[fileIndex].ranges[rangeIndex][field] = value;
+
+    if (field === "copies") {
+      if (!/^\d+$/.test(value) || value == 0) {
+        updatedFiles[fileIndex].ranges[rangeIndex].validCopies = false;
+      } else {
+        updatedFiles[fileIndex].ranges[rangeIndex].validCopies = true;
+      }
+    }
+
+    if (field === "range") {
+      if (isValidRange(value, numPages)) {
+        updatedFiles[fileIndex].ranges[rangeIndex].validRange = true;
+      } else {
+        updatedFiles[fileIndex].ranges[rangeIndex].validRange = false;
+      }
+    }
+
     setFilesWithRanges(updatedFiles);
   }
 
@@ -205,14 +234,15 @@ export default function Root() {
                         </label>
                         <input
                           autoComplete="off"
-                          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className={createRangeInputClass(pageRange)}
                           name="range"
                           onChange={(e) =>
                             handleRangeChange(
                               f.file_name,
                               rowIndex,
                               "range",
-                              e.target.value
+                              e.target.value,
+                              f.num_pages
                             )
                           }
                           defaultValue={pageRange.range}
@@ -229,7 +259,7 @@ export default function Root() {
                         <input
                           type="number"
                           autoComplete="off"
-                          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className={createCopiesInputClass(pageRange)}
                           name="copies"
                           defaultValue={pageRange.copies}
                           onChange={(e) =>
@@ -310,7 +340,7 @@ export default function Root() {
                     <input
                       type="number"
                       autoComplete="off"
-                      className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className={createCopiesInputClass(f.ranges[0])}
                       name="copies"
                       defaultValue={f.ranges[0].copies}
                       onChange={(e) =>
@@ -403,7 +433,9 @@ export default function Root() {
           } text-xl font-semibold text-gray-800 mt-4 max-w-sm mx-auto`}
         >
           Total price:{" "}
-          <span className="text-green-500">Php {totalPrice.toFixed(2)}</span>
+          {validTotalPrice ? (
+            <span className="text-green-500">Php {totalPrice.toFixed(2)}</span>
+          ) : null}
         </p>
 
         {actionData?.placeOrderErrMessage && (
@@ -471,7 +503,7 @@ function countPages(range) {
   return pages.size;
 }
 
-function isValidRange(range) {
+function isValidRange(range, numPages) {
   // Trim leading and trailing spaces and split by commas
   const parts = range.trim().split(",");
 
@@ -489,7 +521,7 @@ function isValidRange(range) {
       const [start, end] = part.split("-");
 
       // Validate that both start and end are numbers and start <= end
-      if (!isValidSingleRange(start, end)) {
+      if (!isValidSingleRange(start, end, numPages)) {
         return false; // Invalid range
       }
     } else {
@@ -497,6 +529,8 @@ function isValidRange(range) {
       if (!/^\d+$/.test(part)) {
         return false; // Invalid single page
       }
+
+      if (Number(part) > numPages) return false;
 
       // Also check if page number is zero or negative, which is invalid
       const pageNum = Number(part);
@@ -509,9 +543,11 @@ function isValidRange(range) {
   return true; // All parts are valid
 }
 
-function isValidSingleRange(start, end) {
+function isValidSingleRange(start, end, numPages) {
   const startNum = Number(start);
   const endNum = Number(end);
+
+  if (endNum > numPages) return false;
 
   // Ensure both start and end are valid numbers, start <= end, and both are non-negative
   return (
@@ -534,6 +570,8 @@ function createFilesWithRanges(files) {
           color: "bw",
           range: `1-${f.num_pages}`,
           copies: 1,
+          validRange: true,
+          validCopies: true,
         },
       ];
       return f;
@@ -558,6 +596,8 @@ function createFilesWithRanges(files) {
             color: "bw",
             range: `1-${f.num_pages}`,
             copies: 1,
+            validRange: true,
+            validCopies: true,
           },
         ];
         output.push(f);
@@ -565,4 +605,22 @@ function createFilesWithRanges(files) {
     }
     return output;
   }
+}
+
+function createCopiesInputClass(range) {
+  return classNames({
+    "w-full p-2 border border-gray-300 rounded-md": true,
+    "ring-2 ring-red-500 focus:outline-none focus:ring-2 focus:ring-red-500":
+      !range.validCopies,
+    "focus:outline-none focus:ring-2 focus:ring-blue-500": range.validCopies,
+  });
+}
+
+function createRangeInputClass(range) {
+  return classNames({
+    "w-full p-2 border border-gray-300 rounded-md": true,
+    "ring-2 ring-red-500 focus:outline-none focus:ring-2 focus:ring-red-500":
+      !range.validRange,
+    "focus:outline-none focus:ring-2 focus:ring-blue-500": range.validRange,
+  });
 }
