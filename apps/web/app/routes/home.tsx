@@ -1,4 +1,5 @@
 import { Link, useLoaderData } from "react-router";
+import PriceGrid from "../components/price-grid.tsx";
 
 export const clientLoader = async () => {
   const res = await fetch("/api/user");
@@ -42,8 +43,17 @@ export default function Home() {
 
       <div className="max-w-72 mx-auto">
         <img src="/dkk-logo.svg" className="my-5 mx-auto border" />
-        <Link to="/order">Start order</Link>
       </div>
+
+      <Link to="/order">
+        <div className="mt-6 flex justify-center">
+          <button className="mt-10 px-6 py-3 bg-blue-500 text-white text-lg font-semibold rounded-md shadow-lg hover:bg-blue-600 transition duration-300 ease-in-out">
+            Start Order
+          </button>
+        </div>
+      </Link>
+
+      <PriceGrid />
     </>
   );
 }
