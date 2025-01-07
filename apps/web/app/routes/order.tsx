@@ -159,6 +159,8 @@ export default function Root() {
       color: "bw",
       range: `1-${updatedFiles[fileIndex].num_pages}`,
       copies: 1,
+      validRange: true,
+      validCopies: true,
     });
     setFilesWithRanges(updatedFiles);
   }
