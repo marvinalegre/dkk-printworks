@@ -10,6 +10,8 @@ export const clientLoader = async () => {
 export default function Home() {
   const { loggedIn, username } = useLoaderData();
 
+  sessionStorage.clear();
+
   return (
     <>
       <nav className="navbar bg-sky-500 h-9 text-white md:rounded-tl md:rounded-tr">
