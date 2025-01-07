@@ -28,6 +28,7 @@ import {
   getOrderId,
   insertPageRange,
   updateOrder,
+  removeFile,
 } from "./utils/db.js";
 import {
   pdfToImage,
@@ -44,6 +45,28 @@ app.use(express.json());
 app.use("/api", cookieParser());
 app.use("/api", jwtAuthenticator());
 
+app.post("/api/remove", async (req, res) => {
+  if (!req.jwtId) {
+    res.status(401).json({ err: "unauthorized" });
+    return;
+  }
+
+  const userId = await getUserId(req.jwtId);
+  if (!userId) {
+    res.status(401).json({ err: "unauthorized" });
+    return;
+  }
+
+  const { orderRefNumber, remove } = req.body;
+
+  try {
+    await removeFile(remove, orderRefNumber);
+
+    res.json({ success: true });
+  } catch (e) {
+    res.json({ success: false });
+  }
+});
 app.get("/api/orders", async (req, res) => {
   if (!req.jwtId) {
     res.status(401).json({ err: "unauthorized" });

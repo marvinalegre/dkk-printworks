@@ -231,11 +231,27 @@ export async function insertPageRange(
   db.close();
 }
 
+export async function removeFile(filename, orderRefNumber) {
+  const db = new Database(`${process.cwd()}/db.sql`);
+  db.pragma("journal_mode = WAL");
+
+  const result = db
+    .prepare("select order_id from orders where order_reference_number = ?")
+    .get(orderRefNumber);
+
+  const info = db
+    .prepare("delete from files where file_name = ? and order_id = ?")
+    .run(filename, result.order_id);
+
+  if (info.changes !== 1) throw "file was not removed";
+
+  db.close();
+}
+
 export async function updateOrder(newPrice, orderRefNumber) {
   const db = new Database(`${process.cwd()}/db.sql`);
   db.pragma("journal_mode = WAL");
 
-  console.log("hit");
   const info = db
     .prepare(
       "update orders set total_price = ?, pending_at = CURRENT_TIMESTAMP, status = 'pe' where order_reference_number = ?"

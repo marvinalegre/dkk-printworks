@@ -12,7 +12,27 @@ import { useState, useEffect } from "react";
 
 export const clientAction = async ({ request }) => {
   const formData = await request.formData();
-  if (formData.get("f0-paperSize0") != null) {
+  if (formData.get("remove") != null) {
+    const res = await fetch("/api/remove", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        remove: formData.get("remove"),
+        orderRefNumber: formData.get("orderRefNumber"),
+      }),
+    });
+    const { success } = await res.json();
+
+    if (success) {
+      return null;
+    } else {
+      return {
+        removeFileErrMessage: "something went wrong while removing file",
+      };
+    }
+  } else if (formData.get("f0-paperSize0") != null) {
     const order = {
       orderRefNumber: formData.get("orderRefNumber"),
       totalPrice: formData.get("totalPrice"),
@@ -146,6 +166,19 @@ export default function Root() {
     setFilesWithRanges(updatedFiles);
   }
 
+  function removeFile(filename) {
+    try {
+      submit({ remove: filename, orderRefNumber }, { method: "post" });
+    } catch (e) {
+      console.log(e);
+    }
+
+    const updatedFiles = JSON.parse(JSON.stringify(filesWithRanges));
+    const fileIndex = updatedFiles.findIndex((f) => f.file_name === filename);
+    updatedFiles.splice(fileIndex, 1);
+    setFilesWithRanges(updatedFiles);
+  }
+
   function addRange(filename) {
     const updatedFiles = JSON.parse(JSON.stringify(filesWithRanges));
     const fileIndex = updatedFiles.findIndex((f) => f.file_name === filename);
@@ -157,6 +190,13 @@ export default function Root() {
       validRange: true,
       validCopies: true,
     });
+    setFilesWithRanges(updatedFiles);
+  }
+
+  function removeRange(filename, index) {
+    const updatedFiles = JSON.parse(JSON.stringify(filesWithRanges));
+    const fileIndex = updatedFiles.findIndex((f) => f.file_name === filename);
+    updatedFiles[fileIndex].ranges.splice(index, 1);
     setFilesWithRanges(updatedFiles);
   }
 
@@ -223,7 +263,7 @@ export default function Root() {
                   {f.ranges.map((pageRange, rowIndex) => (
                     <div
                       key={rowIndex}
-                      className="mb-4 border shadow px-3 pt-3 rounded bg-gray-100"
+                      className="mb-4 border shadow px-3 p-3 rounded bg-gray-100"
                     >
                       <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-600 mb-2">
@@ -322,11 +362,21 @@ export default function Root() {
                           <option value="a">A4</option>
                         </select>
                       </div>
+
+                      {f.ranges.length > 1 && (
+                        <button
+                          type="button"
+                          className="rounded bg-black px-5 py-1 text-lg font-medium text-white hover:bg-gray-600 text-center"
+                          onClick={(e) => removeRange(f.file_name, rowIndex)}
+                        >
+                          remove page range
+                        </button>
+                      )}
                     </div>
                   ))}
                 </>
               ) : (
-                <div className="mb-10 border shadow px-3 pt-3 rounded bg-gray-100">
+                <div className="mb-4 border shadow px-3 pt-3 rounded bg-gray-100">
                   <div className="mb-4">
                     <label
                       htmlFor="copies"
@@ -405,15 +455,25 @@ export default function Root() {
                   </div>
                 </div>
               )}
-              {f.mode === "custom" ? (
+              <div className="flex item-center justify-items">
+                {f.mode === "custom" ? (
+                  <button
+                    type="button"
+                    className="rounded bg-sky-700 px-5 py-1 m-auto text-lg font-medium text-white hover:bg-sky-600 text-center"
+                    onClick={(e) => addRange(f.file_name)}
+                  >
+                    add page range
+                  </button>
+                ) : null}
+
                 <button
                   type="button"
-                  className="rounded bg-sky-700 px-5 py-1 m-auto text-lg font-medium text-white hover:bg-sky-600 text-center"
-                  onClick={(e) => addRange(f.file_name)}
+                  className="rounded bg-black px-5 py-1 m-auto text-lg font-medium text-white hover:bg-gray-600 text-center"
+                  onClick={() => removeFile(f.file_name)}
                 >
-                  add page range
+                  remove file
                 </button>
-              ) : null}
+              </div>
             </div>
           ))}
         </div>
